@@ -7,8 +7,9 @@ LIRUVA's original source is GPL-3.0-or-later. Every third-party crate, bundled s
 | Component | Pinned version | Upstream license | Purpose |
 | --- | --- | --- | --- |
 | [eframe/egui](https://github.com/emilk/egui) | 0.36.2 | MIT OR Apache-2.0 | Native desktop UI |
+| [CPAL](https://github.com/RustAudio/cpal) | 0.18.2 | Apache-2.0 | Native audio output |
 
-The version and upstream license above have been checked against published eframe metadata. This is **not** a complete audit of all transitive dependencies; maintainers must review the resolved Cargo dependency tree before distributing binaries.
+The direct versions and licenses above have been checked against upstream crate metadata. This is **not** a complete audit of all transitive dependencies; maintainers must review the resolved Cargo dependency tree before distributing binaries.
 
 ## Rules
 
