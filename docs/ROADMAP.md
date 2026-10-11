@@ -1,33 +1,33 @@
-# Roadmap
+# Development roadmap
 
-LIRUVA is developed incrementally; no roadmap item is considered delivered before it can be tested.
+LIRUVA is built incrementally. Features are not considered shipped until tested and reviewed. All source and user-facing content are in English.
 
 | Milestone | Deliverable | Status |
 | --- | --- | --- |
-| 0 — Foundation | Native Rust shell, complete public source, licensing, docs, CI | PR #1 checks passed; pending merge |
-| 1.1 — First sound | One local kick, BPM slider, Play/Stop, dark Material-inspired UI | CI passed; PR #3 pending merge |
-| 1.2 — First beat | 16-step sequencer, 4 synthesized percussion voices | In review; device smoke test pending |
-| 2 — Save projects | Open documented project format, create/save/load, round-trip tests | Planned |
+| 0 — Foundation | Native Rust shell, GPL license, docs, CI | PR #1 — checks passed, pending merge |
+| 1.1 — First sound | Locally synthesized kick, Play/Stop, tempo, dark interface | PR #3 — checks passed, pending merge |
+| 1.2 — First beat | Four voices, 16-step looping drum sequencer | PR #5 — tests passed, desktop smoke test pending |
+| 2.1 — Project files | Versioned JSON, Save/Open, validation and tests | In development, separate PR |
+| 2.2 — Project polish | Improved unsaved-change handling, project naming and file recovery | Planned |
 | 3 — Notes | Simplified piano roll, note editing, pattern duplication | Planned |
-| 4 — Arrange | Minimal timeline with repeatable patterns | Planned |
+| 4 — Arrange | Timeline with repeatable patterns | Planned |
 | 5 — Export | Deterministic offline WAV export | Planned |
-| 6 — Mix | Volume, panning, metering, basic effects | Planned |
-| 7 — Extend | MIDI and evaluation of compatible open plugin formats | Planned |
-| 8 — Optional AI | Structured validated commands, optional local models and MCP | Planned |
+| 6 — Mix | Volume, panning, metering and essential effects | Planned |
+| 7 — Extend | MIDI and compatible open plugin formats | Planned |
+| 8 — Optional AI | Validated commands, optional local models and MCP | Planned |
 
-## Milestone 1.2 acceptance criteria
+## Milestone 2.1 acceptance criteria
 
-- The desktop app opens into a clear, usable **English-language** 16-step grid.
-- Four percussion sounds are generated locally with no proprietary samples.
-- Play/stop actually emits audio through a device.
-- BPM adjusts musical timing consistently.
-- Sequencer state remains stable under common UI interactions.
-- The audio callback contains no blocking operations.
-- Tests cover timing independently of an audio device.
-- No AI key, account, network, or plugin is required.
+- Save a named pattern in a small, open, documented `.liruva` file.
+- Restore the exact 16-step masks and BPM after closing and reopening the desktop app.
+- An invalid file must leave the current project untouched and display an understandable error.
+- Unsaved edits must not be silently lost when opening another project.
+- Disk operations must remain outside the real-time audio callback.
+- Automated serialization, validation and file I/O tests must pass.
+- File dialogs and audio must be tested on a real desktop before a stable release.
 
-## Not our goal
+## Non-goals
 
-A feature-by-feature FL Studio clone, a purely visual DAW simulation, or an AI-only music generator.
+We are not recreating FL Studio feature-for-feature, distributing proprietary samples, introducing accounts, or building an AI-only music generator.
 
-Contributors: please open one focused issue per verifiable feature and avoid mixing future milestones into present-day PRs.
+Contributors should keep each Pull Request small, verifiable, and focused on one user-facing improvement.
