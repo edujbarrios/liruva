@@ -2,6 +2,15 @@
 
 All notable project milestones will be documented here.
 
+## Unreleased — Milestone 2.1
+
+- Added a documented, versioned, human-readable `.liruva` project format.
+- Added native Open, Save and Save As actions plus editable project names.
+- Added a confirmation before opening another project with unsaved edits.
+- Added validation and 64 KiB load limit; rejected projects leave active session unchanged.
+- Added temporary-file-based writes and file round-trip/error tests.
+- Cleaned English documentation and removed accidental literal newline escapes.
+
 ## Unreleased — Milestone 1.2
 
 - Added a real, looping 16-step sequencer in 4/4 with four synthesized drum voices.
