@@ -96,8 +96,8 @@ pub fn load_from_path(path: &Path) -> Result<Project, String> {
         return Err("Project file is larger than the supported 64 KiB limit.".to_owned());
     }
 
-    let project: Project = serde_json::from_slice(&data)
-        .map_err(|error| format!("Invalid project JSON: {error}"))?;
+    let project: Project =
+        serde_json::from_slice(&data).map_err(|error| format!("Invalid project JSON: {error}"))?;
     project.validate()?;
     Ok(project)
 }
