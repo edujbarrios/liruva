@@ -7,26 +7,42 @@
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/license-GPL--3.0--or--later-blue)](LICENSE)
 [![CI](https://github.com/edujbarrios/liruva/actions/workflows/ci.yml/badge.svg)](https://github.com/edujbarrios/liruva/actions/workflows/ci.yml)
 
-LIRUVA is an independent, community-driven, **free and open-source** digital audio workstation (DAW) in its earliest stage of development.
+LIRUVA is an independent, community-driven, **free and open-source** digital audio workstation (DAW) at an early stage of development. The goal is to make music production easy to understand without sacrificing creative freedom.
 
-The goal is simple: make producing music approachable. We are inspired by the familiar creative workflows of existing DAWs, but LIRUVA has its own identity, implementation, and interface. **It is not affiliated with Image-Line or FL Studio.**
+LIRUVA has its own original implementation, dark interface, and identity. It is **not affiliated with Image-Line or FL Studio**.
 
-## Current status: Milestone 1.2 — first drum sequencer (development branch)
+## Development status — Milestone 2.1
 
-**Implemented in this branch:**
-- Rust workspace and original dark Material-inspired interface.
-- A 16-step, four-track looping drum sequencer with synthesized Kick, Snare, Hi-Hat, and Clap.\n- Editable steps, current-step playhead, a starter groove, and Clear All.\n- Real audio playback with Play/Stop and adjustable BPM.
-- Thread-safe pattern and transport controls with a sample-timed, hardware-independent step clock.
-- Visible error status when no audio output device is available.
-- Project mission, GPL license, contribution guidelines, architecture notes and CI.
+The following features are implemented **in this development branch**:
 
-**Not implemented yet:** piano roll, arrangement, samples, plugins, project saving, WAV export, MIDI and AI tools.
+- Rust desktop app with an original, dark, Material-inspired design.
+- Four-track drum machine with 16 interactive steps.
+- Four original synthesized sounds: Kick, Snare, Hi-Hat, and Clap.
+- Looping 4/4 playback with adjustable BPM, Play and Stop.
+- **Open**, **Save**, and **Save As** actions using native dialogs.
+- Versioned, human-readable `.liruva` project files storing a name, BPM, and all four patterns.
+- Validation of malformed or unsupported projects before loading them.
+- Warning before opening a project over unsaved changes.
+- GPL-3.0-or-later original source, English-only product copy, and automated Rust checks.
 
-This is an early drum-machine prototype, not yet a full DAW. Audio output must still be checked manually on real Windows, macOS, and Linux machines. See [design guide](docs/DESIGN.md).
+**Not implemented:** piano roll, arrangement, MIDI editing, sample imports, plugins, WAV export, mixer, cloud services, or AI integration.
 
-## Try the first beat\n\n1. Start LIRUVA on a desktop computer with an audio output device.\n2. Click any numbered square to enable or disable a drum hit.\n3. Press **Play**. The 16-step pattern repeats in 4/4.\n4. Drag **Tempo** to change the playback speed.\n5. Click **Clear all steps** or **Load starter beat** to experiment.\n\nThe step grid and instrument labels are in **English**. There is no saving yet; patterns currently live in memory only.\n\n## Build and run
+This is a small drum-machine prototype, **not a full DAW yet**. The sound, native dialogs, and accessibility need real desktop testing on Windows, macOS, and Linux before any official release.
 
-Install a current stable [Rust toolchain](https://rustup.rs/) (minimum Rust 1.95) and system dependencies for the native GUI.
+## Make your first beat
+
+1. Open LIRUVA and select steps for Kick, Snare, Hi-Hat or Clap.
+2. Click **Play**. The bar repeats automatically.
+3. Adjust **Tempo** to change the groove.
+4. Give the project a name and click **Save**.
+5. Quit LIRUVA, start it again, then click **Open** to restore the saved beat.
+6. Use **Save As** to create another copy, or **Clear all steps** to start again.
+
+Files are stored on your own computer as readable JSON with the `.liruva` extension. Read the [project format specification](docs/PROJECT_FORMAT.md) for details. No account, internet access, API key, or AI service is required.
+
+## Build and run
+
+Install a current stable [Rust toolchain](https://rustup.rs/) (minimum supported Rust 1.95) and native desktop development dependencies.
 
 On Ubuntu/Debian:
 
@@ -35,17 +51,18 @@ sudo apt-get update
 sudo apt-get install -y build-essential pkg-config libgtk-3-dev libxkbcommon-dev libwayland-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev libssl-dev libasound2-dev
 ```
 
-On Windows and macOS, install Rust and your platform's native development tooling.
+On Linux, native file dialogs use XDG Desktop Portal (or a supported fallback). A desktop portal service and its backend should be installed; some environments also need Zenity. Windows and macOS need their normal native build tooling.
 
 ```bash
 git clone https://github.com/edujbarrios/liruva.git
 cd liruva
+git switch feat/milestone-2-1-project-files
 cargo run -p liruva
 ```
 
-These changes are under review in stacked Pull Requests. For this feature, check out `feat/milestone-1-2-drum-sequencer` after cloning. The previous audio milestone is on `feat/milestone-1-audio-dark-ui`, and the initial non-audio foundation is on `feat/milestone-0-foundation`.
+This development branch is part of stacked, unmerged PRs. The sequential branches are `feat/milestone-0-foundation`, `feat/milestone-1-audio-dark-ui`, `feat/milestone-1-2-drum-sequencer`, and `feat/milestone-2-1-project-files`.
 
-Check code locally:
+Verify Rust code locally:
 
 ```bash
 cargo fmt --all -- --check
@@ -53,31 +70,26 @@ cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
 ```
 
-The GUI and audio device need a real desktop environment; CI can run Rust checks but cannot verify whether a physical speaker produces sound. Windows and macOS runtime builds have not yet been verified.
+Hardware-free tests run in CI. Physical speaker output and desktop file dialogs cannot be verified in a headless CI environment.
 
-## Development principles
+## Core principles
 
-1. **Free forever, genuinely open source.** Every core feature must be open and redistributable under compatible licenses. No subscriptions or unlocks.
-2. **Simplicity first.** A beginner should be able to make a beat without learning an entire professional DAW.
-3. **Offline by default.** No accounts, telemetry, cloud requirement, or API keys.
-4. **AI is optional.** Basic music creation must work without any language model or internet service.
-5. **Real functionality.** No fake transports, silent sequencers, or nonworking buttons advertised as features.
-6. **Small, reviewable iterations.** One verifiable improvement per pull request.
+1. **Open source from day one.** Original source is GPL-3.0-or-later; all dependencies and bundled assets must be license-compatible.
+2. **Free forever.** No subscriptions, paid features, license keys, or locked functionality.
+3. **Simple by design.** Prioritize the shortest path from opening the app to making music.
+4. **Local-first.** Projects belong to users, not a cloud provider.
+5. **AI is optional.** Users can make music without AI or an internet connection.
+6. **Real features only.** Avoid clickable-looking mock controls that do nothing.
+7. **English-first.** UI, documentation, error messages, GitHub issues, and PRs are written in English.
 
-## Roadmap
+## Development and community
 
-See [docs/ROADMAP.md](docs/ROADMAP.md) for the staged development plan. The **next milestone** is saving and reloading patterns using an open, documented project format.
+See the [roadmap](docs/ROADMAP.md), [architecture](docs/ARCHITECTURE.md), [design system](docs/DESIGN.md), and [contribution guide](CONTRIBUTING.md). Feature proposals and constructive feedback are welcome, especially from beginners.
 
-## Contributing
-
-Read [CONTRIBUTING.md](CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md). Issues and pull requests are welcome. We especially value feedback from beginner music producers.
-
-## License and credits
+## License
 
 Copyright (C) 2026 Eduardo J. Barrios and LIRUVA contributors.
 
-LIRUVA source code is released under the [GNU General Public License v3.0 or later](LICENSE) (`GPL-3.0-or-later`). Please review [docs/DEPENDENCIES.md](docs/DEPENDENCIES.md) before adding dependencies or assets.
-
-The eframe/egui framework is available under MIT OR Apache-2.0, and CPAL under Apache-2.0. They are third-party dependencies, not original LIRUVA code.
+All original LIRUVA source is released under [GNU GPL-3.0-or-later](LICENSE). The third-party dependency licensing policy is documented in [docs/DEPENDENCIES.md](docs/DEPENDENCIES.md).
 
 **LIRUVA — Make music. Freely.**
