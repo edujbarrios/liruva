@@ -9,3 +9,4 @@ repository.workspace = true
 
 [dependencies]
 eframe = "=0.36.2"
+cpal = "=0.18.2"
