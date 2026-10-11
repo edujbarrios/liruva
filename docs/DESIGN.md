@@ -2,7 +2,7 @@
 
 LIRUVA has an original dark design language inspired by the clarity of Material Design and the efficiency of modern music-production interfaces. It does **not** use FL Studio assets, branding, icons, or copied visual layouts.
 
-## Design principles
+## Design principles\n\n**Product language: English.** All UI labels, accessibility text, tooltips, errors, documentation, issues, and pull requests are written in English. No translation system is included yet.
 
 1. **Dark by default**: reduce visual fatigue during long music sessions without obscuring interactive controls.
 2. **Make the first action obvious**: one primary action per work area.
@@ -23,16 +23,16 @@ LIRUVA has an original dark design language inspired by the clarity of Material 
 | Primary | `#FFA751` | Main action, selected control |
 | Foreground | `#EEF2F7` | Main text |
 | Muted | `#A6AFBC` | Supporting text |
-| Success | `#71DEB0` | Ready/playing indicator |
+| Success | `#71DEB0` | Ready/playing indicator |\n| Kick | `#FFA751` | Warm amber |\n| Snare | `#79B5FF` | Soft blue |\n| Hi-Hat | `#71DEB0` | Mint |\n| Clap | `#C797FF` | Violet |
 
 Use corners of 12–18 logical pixels, with generous spacing. Token values live in `crates/liruva-app/src/theme.rs`.
 
 ## Current real behavior
 
-- Play and Stop control a locally synthesized kick sound.
-- BPM slider affects the rhythm.
-- Playback state and triggered beat count are read from the audio callback.
-- Space toggles transport.
+- Play and Stop control four locally synthesized drum sounds (Kick, Snare, Hi-Hat, Clap).
+- The BPM slider affects the 16-step looping rhythm.
+- Playback state, current step and triggered step count are read from the audio callback.
+- Each numbered step is a clickable, keyboard-focusable button. Toggle sounds without stopping playback.
 - A clear error explains when no compatible audio device is available.
 
 ## Not built
