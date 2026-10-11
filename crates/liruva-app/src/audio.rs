@@ -229,8 +229,8 @@ mod tests {
         let mut engine = BeatEngine::new(44_100);
         let mut output = [0.0f32; 512];
         engine.fill(&mut output, 2, &controls);
-        for frame in output.chunks_exact(2) {
-            assert_eq!(frame[0], frame[1]);
+        for pair in output.as_chunks::<2>().0 {
+            assert_eq!(pair[0], pair[1]);
         }
     }
 
