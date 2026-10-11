@@ -1,6 +1,6 @@
 # Architecture
 
-Status: **Milestone 1.2**. A 16-step drum sequencer and four synth voices exist alongside the dark desktop UI; the full DAW architecture remains a proposal.
+Status: **Milestone 2.1**. The drum sequencer now also supports validated, versioned local project files. The full DAW architecture remains a proposal.
 
 ## Philosophy
 
@@ -13,6 +13,7 @@ Cargo workspace
 └── crates/liruva-app/      Native dark desktop UI (egui/eframe)
     └── src/audio.rs       CPAL stream, four drum synthesizers, atomic patterns
     └── src/transport.rs   Sample-accurate 16-step clock (no audio hardware)
+    └── src/project.rs     Versioned JSON serialization, validation, safe file I/O
     └── src/theme.rs       LIRUVA design tokens
 ```
 
@@ -47,6 +48,14 @@ Possible future workspace crates: `liruva-core`, `liruva-audio`, and `liruva-pro
 - Deterministic transport/sequencing where possible.
 - Offline unit tests for timing and DSP; device tests are separate.
 - Prioritize audible correctness before graphical polish.
+
+## Project files
+
+The project model in `src/project.rs` stores exactly four drum masks, tempo and a display name in a documented, versioned `.liruva` JSON format. Deserialization and validation complete before applying data to the audio controls. The audio thread never performs file I/O. Saving first writes and synchronizes a temporary sibling file, then renames it to the chosen path, with errors displayed in the GUI.
+
+Native file dialogs are intentionally modal and run from the desktop UI event loop; they are not part of the audio callback. The format's first version does not include samples or plugin data.
+
+See [PROJECT_FORMAT.md](PROJECT_FORMAT.md).
 
 ## Command model
 
