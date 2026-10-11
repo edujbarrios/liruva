@@ -80,7 +80,9 @@ mod tests {
     #[test]
     fn patterns_loop_back_to_zero_after_step_sixteen() {
         let mut clock = StepClock::new(48_000);
-        let steps: Vec<_> = (0..102_000).filter_map(|_| clock.advance(true, 120)).collect();
+        let steps: Vec<_> = (0..102_000)
+            .filter_map(|_| clock.advance(true, 120))
+            .collect();
         assert_eq!(steps.len(), 17);
         assert_eq!(steps[0], 0);
         assert_eq!(steps[15], 15);
