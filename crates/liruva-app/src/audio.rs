@@ -187,7 +187,9 @@ pub fn open_stream(controls: Arc<AudioControls>) -> Result<Stream, String> {
             )
         }
         unsupported => {
-            return Err(format!("Output sample format {unsupported:?} is not supported yet."));
+            return Err(format!(
+                "Output sample format {unsupported:?} is not supported yet."
+            ));
         }
     }
     .map_err(|err| format!("Cannot create audio stream: {err}"))?;
