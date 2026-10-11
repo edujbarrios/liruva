@@ -5,8 +5,8 @@ LIRUVA is developed incrementally; no roadmap item is considered delivered befor
 | Milestone | Deliverable | Status |
 | --- | --- | --- |
 | 0 — Foundation | Native Rust shell, complete public source, licensing, docs, CI | PR #1 checks passed; pending merge |
-| 1.1 — First sound | One local kick, BPM slider, Play/Stop, dark Material-inspired UI | In review; device smoke test pending |
-| 1.2 — First beat | 16-step sequencer, 4 synthesized percussion voices | Planned |
+| 1.1 — First sound | One local kick, BPM slider, Play/Stop, dark Material-inspired UI | CI passed; PR #3 pending merge |
+| 1.2 — First beat | 16-step sequencer, 4 synthesized percussion voices | In review; device smoke test pending |
 | 2 — Save projects | Open documented project format, create/save/load, round-trip tests | Planned |
 | 3 — Notes | Simplified piano roll, note editing, pattern duplication | Planned |
 | 4 — Arrange | Minimal timeline with repeatable patterns | Planned |
@@ -17,12 +17,12 @@ LIRUVA is developed incrementally; no roadmap item is considered delivered befor
 
 ## Milestone 1.2 acceptance criteria
 
-- The desktop app opens into a clear, usable 16-step grid.
+- The desktop app opens into a clear, usable **English-language** 16-step grid.
 - Four percussion sounds are generated locally with no proprietary samples.
 - Play/stop actually emits audio through a device.
 - BPM adjusts musical timing consistently.
 - Sequencer state remains stable under common UI interactions.
-- Audio callback contains no blocking operations.
+- The audio callback contains no blocking operations.
 - Tests cover timing independently of an audio device.
 - No AI key, account, network, or plugin is required.
 
