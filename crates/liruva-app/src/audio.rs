@@ -160,7 +160,7 @@ pub fn open_stream(controls: Arc<AudioControls>) -> Result<Stream, String> {
             let mut engine = BeatEngine::new(rate);
             let ctrl = Arc::clone(&controls);
             device.build_output_stream(
-                &config,
+                config,
                 move |data: &mut [f32], _| engine.fill(data, channels, &ctrl),
                 |err| eprintln!("LIRUVA audio error: {err}"),
                 None,
@@ -170,7 +170,7 @@ pub fn open_stream(controls: Arc<AudioControls>) -> Result<Stream, String> {
             let mut engine = BeatEngine::new(rate);
             let ctrl = Arc::clone(&controls);
             device.build_output_stream(
-                &config,
+                config,
                 move |data: &mut [i16], _| engine.fill(data, channels, &ctrl),
                 |err| eprintln!("LIRUVA audio error: {err}"),
                 None,
@@ -180,7 +180,7 @@ pub fn open_stream(controls: Arc<AudioControls>) -> Result<Stream, String> {
             let mut engine = BeatEngine::new(rate);
             let ctrl = Arc::clone(&controls);
             device.build_output_stream(
-                &config,
+                config,
                 move |data: &mut [u16], _| engine.fill(data, channels, &ctrl),
                 |err| eprintln!("LIRUVA audio error: {err}"),
                 None,
