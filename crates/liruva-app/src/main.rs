@@ -3,8 +3,7 @@
 
 use eframe::egui;
 
-const MISSION: &str =
-    "In the AI music era, let's make music production tools accessible, intuitive, and free for everyone.";
+const MISSION: &str = "In the AI music era, let's make music production tools accessible, intuitive, and free for everyone.";
 
 struct LiruvaApp;
 
@@ -31,7 +30,10 @@ impl eframe::App for LiruvaApp {
                 ui.add_space(18.0);
                 ui.label("Next: a simple step sequencer with real drum sounds.");
                 ui.add_space(18.0);
-                ui.hyperlink_to("Explore the public source code", "https://github.com/edujbarrios/liruva");
+                ui.hyperlink_to(
+                    "Explore the public source code",
+                    "https://github.com/edujbarrios/liruva",
+                );
                 ui.add_space(12.0);
                 ui.label(
                     egui::RichText::new("Free forever  •  Open source  •  Offline-first")
