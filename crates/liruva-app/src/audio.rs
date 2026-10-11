@@ -323,7 +323,7 @@ pub fn open_stream(controls: Arc<AudioControls>) -> Result<Stream, String> {
 #[cfg(test)]
 mod tests {
     use super::{AudioControls, DrumEngine, DrumVoice};
-    use crate::transport::{STEPS_PER_BAR, STARTER_PATTERN, TRACK_COUNT};
+    use crate::transport::{STARTER_PATTERN, STEPS_PER_BAR, TRACK_COUNT};
 
     #[test]
     fn each_voice_produces_original_finite_sound() {
@@ -362,7 +362,11 @@ mod tests {
         let mut engine = DrumEngine::new(48_000);
         let samples: Vec<f32> = (0..6_000).map(|_| engine.next(&controls)).collect();
         assert!(samples.iter().any(|sample| sample.abs() > 0.01));
-        assert!(samples.iter().all(|sample| sample.is_finite() && sample.abs() <= 0.85));
+        assert!(
+            samples
+                .iter()
+                .all(|sample| sample.is_finite() && sample.abs() <= 0.85)
+        );
         assert_eq!(controls.current_step(), Some(0));
         assert_eq!(controls.steps_triggered(), 1);
         engine.next(&controls);
