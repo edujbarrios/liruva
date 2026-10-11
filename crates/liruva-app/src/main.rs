@@ -445,7 +445,7 @@ impl eframe::App for LiruvaApp {
         }
 
         if self._stream.is_some()
-            && !ui.ctx().wants_keyboard_input()
+            && !ui.ctx().egui_wants_keyboard_input()
             && ui.input(|input| input.key_pressed(egui::Key::Space))
         {
             self.controls.set_playing(!self.controls.is_playing());
