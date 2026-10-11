@@ -153,11 +153,7 @@ impl LiruvaApp {
             .show(ui, |ui| {
                 ui.set_min_width(ui.available_width());
                 ui.horizontal(|ui| {
-                    ui.label(
-                        egui::RichText::new("STEP SEQUENCER")
-                            .size(16.0)
-                            .strong(),
-                    );
+                    ui.label(egui::RichText::new("STEP SEQUENCER").size(16.0).strong());
                     ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                         ui.colored_label(theme::MUTED, "1 BAR  ·  4/4");
                     });
@@ -179,9 +175,7 @@ impl LiruvaApp {
                         ui.add_sized(
                             [94.0, 36.0],
                             egui::Label::new(
-                                egui::RichText::new(*name)
-                                    .color(theme::FOREGROUND)
-                                    .strong(),
+                                egui::RichText::new(*name).color(theme::FOREGROUND).strong(),
                             ),
                         );
 
@@ -240,10 +234,7 @@ impl LiruvaApp {
                         self.controls.clear_pattern();
                     }
                     ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                        ui.colored_label(
-                            theme::MUTED,
-                            "Outlined column = current playhead",
-                        );
+                        ui.colored_label(theme::MUTED, "Outlined column = current playhead");
                     });
                 });
             });
