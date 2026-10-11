@@ -50,7 +50,6 @@ impl LiruvaApp {
         }
     }
 
-
     fn file_dialog(&self, title: &str) -> rfd::FileDialog {
         let dialog = rfd::FileDialog::new()
             .add_filter("LIRUVA project", &[project::FILE_EXTENSION])
