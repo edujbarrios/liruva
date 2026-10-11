@@ -47,7 +47,11 @@ impl LiruvaApp {
                 ui.set_min_width(ui.available_width());
                 ui.colored_label(theme::PRIMARY, "01 / FIRST SOUND");
                 ui.add_space(12.0);
-                ui.label(egui::RichText::new("Your first beat starts here.").size(26.0).strong());
+                ui.label(
+                    egui::RichText::new("Your first beat starts here.")
+                        .size(26.0)
+                        .strong(),
+                );
                 ui.add_space(7.0);
                 ui.colored_label(
                     theme::MUTED,
@@ -109,7 +113,11 @@ impl LiruvaApp {
                         let playing = self.controls.is_playing();
                         ui.colored_label(
                             theme::SUCCESS,
-                            if playing { "●  PLAYING" } else { "●  AUDIO READY" },
+                            if playing {
+                                "●  PLAYING"
+                            } else {
+                                "●  AUDIO READY"
+                            },
                         );
                         ui.add_space(20.0);
                         ui.colored_label(
@@ -123,11 +131,7 @@ impl LiruvaApp {
 
                 if let Some(error) = &self.audio_error {
                     ui.add_space(8.0);
-                    ui.label(
-                        egui::RichText::new(error)
-                            .color(theme::MUTED)
-                            .small(),
-                    );
+                    ui.label(egui::RichText::new(error).color(theme::MUTED).small());
                     ui.label("Connect an audio output device and restart LIRUVA.");
                 }
             });
@@ -149,12 +153,9 @@ impl eframe::App for LiruvaApp {
                         );
                         ui.colored_label(theme::MUTED, "Make music. Freely.");
                     });
-                    ui.with_layout(
-                        egui::Layout::right_to_left(egui::Align::Center),
-                        |ui| {
-                            ui.colored_label(theme::MUTED, "OPEN SOURCE  /  EARLY ALPHA");
-                        },
-                    );
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                        ui.colored_label(theme::MUTED, "OPEN SOURCE  /  EARLY ALPHA");
+                    });
                 });
 
                 ui.add_space(24.0);
@@ -179,7 +180,10 @@ impl eframe::App for LiruvaApp {
                 ui.add_space(25.0);
                 ui.colored_label(theme::MUTED, MISSION);
                 ui.add_space(6.0);
-                ui.hyperlink_to("Explore the source on GitHub", "https://github.com/edujbarrios/liruva");
+                ui.hyperlink_to(
+                    "Explore the source on GitHub",
+                    "https://github.com/edujbarrios/liruva",
+                );
 
                 if self._stream.is_some() && ui.input(|input| input.key_pressed(egui::Key::Space)) {
                     self.controls.set_playing(!self.controls.is_playing());
