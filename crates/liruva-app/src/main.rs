@@ -421,7 +421,7 @@ impl LiruvaApp {
                         ui.colored_label(theme::MUTED, "Outlined column = current playhead");
                     });
                 });
-            });
+    }
 
     fn show_piano_roll(&mut self, ui: &mut egui::Ui) {
         egui::Frame::new()
@@ -524,44 +524,44 @@ impl eframe::App for LiruvaApp {
             .frame(egui::Frame::new().fill(theme::BACKGROUND).inner_margin(22))
             .show(ui, |ui| {
                 egui::ScrollArea::vertical().show(ui, |ui| {
-                ui.horizontal(|ui| {
-                    ui.vertical(|ui| {
-                        ui.label(
-                            egui::RichText::new("LIRUVA")
-                                .size(32.0)
-                                .strong()
-                                .color(theme::PRIMARY),
-                        );
-                        ui.colored_label(theme::MUTED, "Make music. Freely.");
+                    ui.horizontal(|ui| {
+                        ui.vertical(|ui| {
+                            ui.label(
+                                egui::RichText::new("LIRUVA")
+                                    .size(32.0)
+                                    .strong()
+                                    .color(theme::PRIMARY),
+                            );
+                            ui.colored_label(theme::MUTED, "Make music. Freely.");
+                        });
+                        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                            ui.colored_label(theme::MUTED, "OPEN SOURCE / EARLY ALPHA");
+                        });
                     });
-                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                        ui.colored_label(theme::MUTED, "OPEN SOURCE / EARLY ALPHA");
-                    });
-                });
 
-                ui.add_space(12.0);
-                self.show_project_controls(ui);
-                ui.add_space(15.0);
-                self.show_transport(ui);
-                ui.add_space(14.0);
-                self.show_step_grid(ui);
-                ui.add_space(14.0);
-                self.show_piano_roll(ui);
-                ui.add_space(17.0);
-                ui.colored_label(
-                    theme::MUTED,
-                    "Save drums and melody together as open .liruva projects. No account or AI required.",
-                );
-                ui.add_space(8.0);
-                ui.colored_label(theme::MUTED, MISSION);
-                ui.hyperlink_to(
-                    "View the source code on GitHub",
-                    "https://github.com/edujbarrios/liruva",
-                );
+                    ui.add_space(12.0);
+                    self.show_project_controls(ui);
+                    ui.add_space(15.0);
+                    self.show_transport(ui);
+                    ui.add_space(14.0);
+                    self.show_step_grid(ui);
+                    ui.add_space(14.0);
+                    self.show_piano_roll(ui);
+                    ui.add_space(17.0);
+                    ui.colored_label(
+                        theme::MUTED,
+                        "Save drums and melody together as open .liruva projects. No account or AI required.",
+                    );
+                    ui.add_space(8.0);
+                    ui.colored_label(theme::MUTED, MISSION);
+                    ui.hyperlink_to(
+                        "View the source code on GitHub",
+                        "https://github.com/edujbarrios/liruva",
+                    );
 
-                if self.controls.is_playing() {
-                    ui.ctx().request_repaint_after(Duration::from_millis(40));
-                }
+                    if self.controls.is_playing() {
+                        ui.ctx().request_repaint_after(Duration::from_millis(40));
+                    }
                 });
             });
 
