@@ -2,6 +2,14 @@
 
 All notable project milestones will be documented here.
 
+## Unreleased — Milestone 3.2
+
+- Added visible Undo/Redo controls and cross-platform keyboard shortcuts.
+- Added bounded 64-edit history for drum patterns, melody, tempo, and project names.
+- Made unsaved changes follow the saved snapshot, so undoing back to a saved beat clears the dirty indicator.
+- Reset history when opening or creating a project; Save now establishes the saved baseline.
+- Added deterministic history tests and a real UI screenshot capture workflow for milestone branches.
+
 ## Unreleased — Milestone 3.1
 
 - Added a two-octave C4–B5 piano roll with one note per sixteenth step.

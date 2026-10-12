@@ -2,6 +2,7 @@
 // Copyright (C) 2026 Eduardo J. Barrios and LIRUVA contributors.
 
 mod audio;
+mod history;
 mod melody;
 mod project;
 mod theme;
@@ -14,6 +15,7 @@ use std::time::Duration;
 use eframe::egui;
 
 use crate::audio::AudioControls;
+use crate::history::{EditHistory, EditorState};
 use crate::melody::{MELODY_PITCH_COUNT, pitch_name};
 use crate::project::{Project, load_from_path, normalize_save_path, save_to_path};
 use crate::transport::{STEPS_PER_BAR, TRACK_COUNT, TRACK_NAMES};
@@ -37,6 +39,8 @@ struct LiruvaApp {
     pending_action: Option<PendingAction>,
     allow_close: bool,
     project_notice: Option<(bool, String)>,
+    edit_history: EditHistory,
+    saved_state: EditorState,
 }
 
 impl LiruvaApp {
@@ -48,6 +52,8 @@ impl LiruvaApp {
             Err(error) => (None, Some(error)),
         };
 
+        let saved_state = EditorState::capture("Untitled Beat", &controls);
+
         Self {
             controls,
             _stream: stream,
@@ -58,6 +64,38 @@ impl LiruvaApp {
             pending_action: None,
             allow_close: false,
             project_notice: None,
+            edit_history: EditHistory::default(),
+            saved_state,
+        }
+    }
+
+    fn snapshot(&self) -> EditorState {
+        EditorState::capture(&self.project_name, &self.controls)
+    }
+
+    fn finish_edit(&mut self, before: EditorState) {
+        let now = self.snapshot();
+        self.edit_history.record(before, &now);
+        self.dirty = now != self.saved_state;
+    }
+
+    fn apply_edit_state(&mut self, state: EditorState) {
+        state.apply(&self.controls);
+        self.project_name = state.name;
+        self.dirty = self.snapshot() != self.saved_state;
+    }
+
+    fn undo_edit(&mut self) {
+        let current = self.snapshot();
+        if let Some(previous) = self.edit_history.undo(current) {
+            self.apply_edit_state(previous);
+        }
+    }
+
+    fn redo_edit(&mut self) {
+        let current = self.snapshot();
+        if let Some(next) = self.edit_history.redo(current) {
+            self.apply_edit_state(next);
         }
     }
 
@@ -100,6 +138,7 @@ impl LiruvaApp {
         match save_to_path(&path, &file) {
             Ok(()) => {
                 self.project_path = Some(path);
+                self.saved_state = self.snapshot();
                 self.dirty = false;
                 self.project_notice = Some((true, "Project saved successfully.".to_owned()));
                 true
@@ -121,6 +160,8 @@ impl LiruvaApp {
                 project.apply(&self.controls);
                 self.project_name = project.name;
                 self.project_path = Some(path);
+                self.edit_history.reset();
+                self.saved_state = self.snapshot();
                 self.dirty = false;
                 self.project_notice = Some((true, "Project opened successfully.".to_owned()));
             }
@@ -137,6 +178,8 @@ impl LiruvaApp {
         self.controls.clear_melody();
         self.project_name = "Untitled Beat".to_owned();
         self.project_path = None;
+        self.edit_history.reset();
+        self.saved_state = self.snapshot();
         self.dirty = false;
         self.project_notice = Some((true, "New project created.".to_owned()));
     }
@@ -169,6 +212,7 @@ impl LiruvaApp {
                 ui.set_min_width(ui.available_width());
                 ui.horizontal(|ui| {
                     ui.colored_label(theme::MUTED, "PROJECT");
+                    let before = self.snapshot();
                     if ui
                         .add(
                             egui::TextEdit::singleline(&mut self.project_name)
@@ -177,7 +221,7 @@ impl LiruvaApp {
                         )
                         .changed()
                     {
-                        self.dirty = true;
+                        self.finish_edit(before);
                     }
 
                     if ui.button("New").clicked() {
@@ -201,6 +245,25 @@ impl LiruvaApp {
                         };
                         ui.colored_label(theme::MUTED, label);
                     });
+                });
+
+                ui.add_space(7.0);
+                ui.horizontal(|ui| {
+                    if ui
+                        .add_enabled(self.edit_history.can_undo(), egui::Button::new("↶ Undo"))
+                        .on_hover_text("Undo the last edit (Ctrl/Cmd+Z)")
+                        .clicked()
+                    {
+                        self.undo_edit();
+                    }
+                    if ui
+                        .add_enabled(self.edit_history.can_redo(), egui::Button::new("↷ Redo"))
+                        .on_hover_text("Redo an edit (Ctrl/Cmd+Shift+Z or Ctrl/Cmd+Y)")
+                        .clicked()
+                    {
+                        self.redo_edit();
+                    }
+                    ui.colored_label(theme::MUTED, "Experiment freely — up to 64 edits");
                 });
 
                 if let Some((success, message)) = &self.project_notice {
@@ -279,8 +342,9 @@ impl LiruvaApp {
                             .add(egui::Slider::new(&mut bpm, 60..=200).suffix(" BPM"))
                             .changed()
                         {
+                            let before = self.snapshot();
                             self.controls.set_bpm(bpm);
-                            self.dirty = true;
+                            self.finish_edit(before);
                         }
                     });
                 });
@@ -399,8 +463,9 @@ impl LiruvaApp {
                                 ))
                                 .clicked()
                             {
+                                let before = self.snapshot();
                                 self.controls.toggle_step(track, step);
-                                self.dirty = true;
+                                self.finish_edit(before);
                             }
                         }
                     });
@@ -410,12 +475,14 @@ impl LiruvaApp {
                 ui.add_space(11.0);
                 ui.horizontal(|ui| {
                     if ui.button("Load starter beat").clicked() {
+                        let before = self.snapshot();
                         self.controls.load_starter_pattern();
-                        self.dirty = true;
+                        self.finish_edit(before);
                     }
                     if ui.button("Clear all steps").clicked() {
+                        let before = self.snapshot();
                         self.controls.clear_pattern();
-                        self.dirty = true;
+                        self.finish_edit(before);
                     }
                     ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                         ui.colored_label(theme::MUTED, "Outlined column = current playhead");
@@ -493,11 +560,12 @@ impl LiruvaApp {
                                         ))
                                         .clicked()
                                     {
+                                        let before = self.snapshot();
                                         self.controls.set_melody_note(
                                             step,
                                             if active { None } else { Some(pitch as u8) },
                                         );
-                                        self.dirty = true;
+                                        self.finish_edit(before);
                                     }
                                 }
                             });
@@ -507,12 +575,14 @@ impl LiruvaApp {
                 ui.add_space(10.0);
                 ui.horizontal(|ui| {
                     if ui.button("Load demo melody").clicked() {
+                        let before = self.snapshot();
                         self.controls.load_demo_melody();
-                        self.dirty = true;
+                        self.finish_edit(before);
                     }
                     if ui.button("Clear melody").clicked() {
+                        let before = self.snapshot();
                         self.controls.clear_melody();
-                        self.dirty = true;
+                        self.finish_edit(before);
                     }
                     ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                         ui.colored_label(theme::MUTED, "Scroll vertically to explore two octaves");
@@ -604,11 +674,25 @@ impl eframe::App for LiruvaApp {
                 });
         }
 
-        if self._stream.is_some()
-            && !ui.ctx().egui_wants_keyboard_input()
-            && ui.input(|input| input.key_pressed(egui::Key::Space))
-        {
-            self.controls.set_playing(!self.controls.is_playing());
+        if !ui.ctx().egui_wants_keyboard_input() {
+            let (undo, redo, play_toggle) = ui.input(|input| {
+                let command = input.modifiers.command;
+                let shift = input.modifiers.shift;
+                (
+                    command && !shift && input.key_pressed(egui::Key::Z),
+                    command
+                        && ((shift && input.key_pressed(egui::Key::Z))
+                            || input.key_pressed(egui::Key::Y)),
+                    input.key_pressed(egui::Key::Space),
+                )
+            });
+            if undo {
+                self.undo_edit();
+            } else if redo {
+                self.redo_edit();
+            } else if play_toggle && self._stream.is_some() {
+                self.controls.set_playing(!self.controls.is_playing());
+            }
         }
     }
 }

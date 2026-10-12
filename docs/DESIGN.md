@@ -54,6 +54,10 @@ The public README includes a **capture from the real Rust app**, not an artist's
 
 Capture source: `scripts/capture-screenshot.sh` and `.github/workflows/screenshot-preview.yml`.
 
+## Editing safely
+
+The project strip offers clearly labeled **Undo** and **Redo** buttons, with shortcuts Ctrl/Cmd+Z, Ctrl/Cmd+Shift+Z, and Ctrl/Cmd+Y. History is bounded to 64 actual edits and remains exclusively on the UI thread, not in the real-time audio callback. Dirty-state feedback compares the current edit snapshot against the last saved state.
+
 ## Follow-up accessibility work
 
 Test the native file dialogs and screen readers on Windows, macOS and Linux. Add a high-contrast mode and full keyboard navigation as dedicated, tested improvements. Avoid using color as the only way to indicate state.

@@ -1,6 +1,6 @@
 # Architecture
 
-Status: **Milestone 3.1**. The drum sequencer now also supports validated, versioned local project files. The full DAW architecture remains a proposal.
+Status: **Milestone 3.2**. The drum sequencer now also supports validated, versioned local project files. The full DAW architecture remains a proposal.
 
 ## Philosophy
 
@@ -14,6 +14,7 @@ Cargo workspace
     └── src/audio.rs       CPAL stream, four drum synthesizers, atomic patterns
     └── src/transport.rs   Sample-accurate 16-step clock (no audio hardware)
     └── src/project.rs     Versioned JSON serialization, validation, safe file I/O
+    └── src/history.rs     Bounded UI-only undo/redo snapshots
     └── src/melody.rs      24 chromatic note names and frequencies\n    └── src/theme.rs       LIRUVA design tokens
 ```
 
@@ -56,6 +57,10 @@ The project model in `src/project.rs` stores four drum masks, sixteen optional m
 Native file dialogs are intentionally modal and run from the desktop UI event loop; they are not part of the audio callback. Version 2 adds melody with an explicit migration for version-1 drum-only files. The format contains no samples or plugin data.
 
 See [PROJECT_FORMAT.md](PROJECT_FORMAT.md).
+
+## Edit history
+
+Editor snapshots contain the editable project name, tempo, four drum masks and 16 melodic notes. A bounded undo and redo stack lives in the UI model, not in the audio engine. Atomic controls receive the restored values without audio-thread locks. Project Open/New reset the edit history, while Save updates the baseline used for the unsaved-change indicator. The on-disk format remains version 2; edit history is intentionally not serialized.
 
 ## Unsaved project handling
 
