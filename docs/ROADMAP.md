@@ -7,8 +7,8 @@ LIRUVA is built incrementally. Features are not considered shipped until tested 
 | 0 — Foundation | Native Rust shell, GPL license, docs, CI | PR #1 — checks passed, pending merge |
 | 1.1 — First sound | Locally synthesized kick, Play/Stop, tempo, dark interface | PR #3 — checks passed, pending merge |
 | 1.2 — First beat | Four voices, 16-step looping drum sequencer | PR #5 — tests passed, desktop smoke test pending |
-| 2.1 — Project files | Versioned JSON, Save/Open, validation and tests | In development, separate PR |
-| 2.2 — Project polish | Improved unsaved-change handling, project naming and file recovery | Planned |
+| 2.1 — Project files | Versioned JSON, Save/Open, validation and tests | PR #7 — checks passed, pending merge |
+| 2.2 — Project polish | Guard unsaved work on close/new/open, overwrite tests, real screenshot | In review; desktop smoke test pending |
 | 3 — Notes | Simplified piano roll, note editing, pattern duplication | Planned |
 | 4 — Arrange | Timeline with repeatable patterns | Planned |
 | 5 — Export | Deterministic offline WAV export | Planned |
