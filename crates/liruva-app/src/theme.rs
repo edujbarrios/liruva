@@ -12,6 +12,13 @@ pub const FOREGROUND: Color32 = Color32::from_rgb(238, 242, 247);
 pub const MUTED: Color32 = Color32::from_rgb(166, 175, 188);
 pub const SUCCESS: Color32 = Color32::from_rgb(113, 222, 176);
 
+pub const DRUM_COLORS: [Color32; 4] = [
+    Color32::from_rgb(255, 167, 81),  // Kick: amber
+    Color32::from_rgb(121, 181, 255), // Snare: blue
+    Color32::from_rgb(113, 222, 176), // Hi-Hat: mint
+    Color32::from_rgb(199, 151, 255), // Clap: violet
+];
+
 pub fn apply(ctx: &egui::Context) {
     let mut visuals = egui::Visuals::dark();
     visuals.panel_fill = BACKGROUND;

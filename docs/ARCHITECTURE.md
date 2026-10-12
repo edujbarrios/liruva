@@ -1,6 +1,6 @@
 # Architecture
 
-Status: **Milestone 1.1**. A first audio slice exists alongside the dark desktop UI; the full DAW architecture is still a proposal.
+Status: **Milestone 1.2**. A 16-step drum sequencer and four synth voices exist alongside the dark desktop UI; the full DAW architecture remains a proposal.
 
 ## Philosophy
 
@@ -11,12 +11,12 @@ The smallest usable musical workflow wins. The interface should reveal complexit
 ```text
 Cargo workspace
 └── crates/liruva-app/      Native dark desktop UI (egui/eframe)
-    └── src/audio.rs       CPAL stream, real kick synthesis, atomics
-    └── src/transport.rs   Deterministic musical clock (no audio hardware)
+    └── src/audio.rs       CPAL stream, four drum synthesizers, atomic patterns
+    └── src/transport.rs   Sample-accurate 16-step clock (no audio hardware)
     └── src/theme.rs       LIRUVA design tokens
 ```
 
-The UI has a working transport connected to a CPAL output callback. A locally synthesized kick is generated in the callback, and playback is controlled with atomics. No audio is produced until Play is pressed.
+The UI has a working transport and 16-step grid connected to a CPAL output callback. Four local percussion sounds are generated in the callback, and per-track 16-bit pattern masks are read via atomics. Editing any step never locks the audio thread. No audio is produced until Play is pressed.
 
 ## Planned separation (not implemented)
 

@@ -11,20 +11,20 @@ LIRUVA is an independent, community-driven, **free and open-source** digital aud
 
 The goal is simple: make producing music approachable. We are inspired by the familiar creative workflows of existing DAWs, but LIRUVA has its own identity, implementation, and interface. **It is not affiliated with Image-Line or FL Studio.**
 
-## Current status: Milestone 1.1 — first sound (development branch)
+## Current status: Milestone 1.2 — first drum sequencer (development branch)
 
 **Implemented in this branch:**
 - Rust workspace and original dark Material-inspired interface.
-- Actual synthesized kick drum on each beat, with Play/Stop and adjustable BPM.
-- Thread-safe transport controls and a separate, testable beat clock.
+- A 16-step, four-track looping drum sequencer with synthesized Kick, Snare, Hi-Hat, and Clap.\n- Editable steps, current-step playhead, a starter groove, and Clear All.\n- Real audio playback with Play/Stop and adjustable BPM.
+- Thread-safe pattern and transport controls with a sample-timed, hardware-independent step clock.
 - Visible error status when no audio output device is available.
 - Project mission, GPL license, contribution guidelines, architecture notes and CI.
 
-**Not implemented yet:** 16-step sequencer, multiple drum channels, piano roll, arrangement, samples, plugins, project saving, WAV export and AI tools.
+**Not implemented yet:** piano roll, arrangement, samples, plugins, project saving, WAV export, MIDI and AI tools.
 
-This is an early playable prototype, not yet a full DAW. Audio device playback must still be checked manually on supported desktop platforms. See [design guide](docs/DESIGN.md).
+This is an early drum-machine prototype, not yet a full DAW. Audio output must still be checked manually on real Windows, macOS, and Linux machines. See [design guide](docs/DESIGN.md).
 
-## Build and run
+## Try the first beat\n\n1. Start LIRUVA on a desktop computer with an audio output device.\n2. Click any numbered square to enable or disable a drum hit.\n3. Press **Play**. The 16-step pattern repeats in 4/4.\n4. Drag **Tempo** to change the playback speed.\n5. Click **Clear all steps** or **Load starter beat** to experiment.\n\nThe step grid and instrument labels are in **English**. There is no saving yet; patterns currently live in memory only.\n\n## Build and run
 
 Install a current stable [Rust toolchain](https://rustup.rs/) (minimum Rust 1.95) and system dependencies for the native GUI.
 
@@ -43,7 +43,7 @@ cd liruva
 cargo run -p liruva
 ```
 
-These changes are under review in stacked Pull Requests. For this feature, check out `feat/milestone-1-audio-dark-ui` after cloning. To run the original non-audio foundation instead, check out `feat/milestone-0-foundation`.
+These changes are under review in stacked Pull Requests. For this feature, check out `feat/milestone-1-2-drum-sequencer` after cloning. The previous audio milestone is on `feat/milestone-1-audio-dark-ui`, and the initial non-audio foundation is on `feat/milestone-0-foundation`.
 
 Check code locally:
 
@@ -66,7 +66,7 @@ The GUI and audio device need a real desktop environment; CI can run Rust checks
 
 ## Roadmap
 
-See [docs/ROADMAP.md](docs/ROADMAP.md) for the staged development plan. The **next milestone** is a minimal 16-step drum sequencer with real sound.
+See [docs/ROADMAP.md](docs/ROADMAP.md) for the staged development plan. The **next milestone** is saving and reloading patterns using an open, documented project format.
 
 ## Contributing
 
@@ -78,6 +78,6 @@ Copyright (C) 2026 Eduardo J. Barrios and LIRUVA contributors.
 
 LIRUVA source code is released under the [GNU General Public License v3.0 or later](LICENSE) (`GPL-3.0-or-later`). Please review [docs/DEPENDENCIES.md](docs/DEPENDENCIES.md) before adding dependencies or assets.
 
-The eframe/egui framework is a third-party dependency under MIT OR Apache-2.0. It is not part of the original LIRUVA codebase.
+The eframe/egui framework is available under MIT OR Apache-2.0, and CPAL under Apache-2.0. They are third-party dependencies, not original LIRUVA code.
 
 **LIRUVA — Make music. Freely.**

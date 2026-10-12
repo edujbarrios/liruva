@@ -2,7 +2,7 @@
 
 Thanks for helping make music production accessible to everyone.
 
-## Before opening a pull request
+## Language and communication\n\nEnglish is the project's default language. Use English for UI text, source comments, documentation, GitHub issues and pull requests. Existing user-facing copy must remain readable and beginner-friendly. Future localization is welcome as a separate milestone.\n\n## Before opening a pull request
 
 - Read the [roadmap](docs/ROADMAP.md) and [architecture](docs/ARCHITECTURE.md).
 - Propose one small feature or fix per issue/PR.
