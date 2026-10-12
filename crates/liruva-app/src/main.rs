@@ -86,13 +86,15 @@ impl LiruvaApp {
     }
 
     fn undo_edit(&mut self) {
-        if let Some(previous) = self.edit_history.undo(self.snapshot()) {
+        let current = self.snapshot();
+        if let Some(previous) = self.edit_history.undo(current) {
             self.apply_edit_state(previous);
         }
     }
 
     fn redo_edit(&mut self) {
-        if let Some(next) = self.edit_history.redo(self.snapshot()) {
+        let current = self.snapshot();
+        if let Some(next) = self.edit_history.redo(current) {
             self.apply_edit_state(next);
         }
     }
