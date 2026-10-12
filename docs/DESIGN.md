@@ -40,12 +40,19 @@ Token definitions live in `crates/liruva-app/src/theme.rs`. Main surfaces use ro
 - Tempo adjusts sixteenth-note playback timing.
 - The current step is outlined using the actual audio clock state.
 - Save, Save As and Open use native dialogs, with plain-English error messages.
-- When a user tries to open another project with unsaved changes, LIRUVA asks for confirmation.
+- Unsaved changes trigger a confirmation when the user opens a project, creates a new project, or closes the window.
+- The user can Save and continue, Discard changes, or Cancel.
 - Loading a malformed project never replaces the existing pattern.
 
 ## Not built yet
 
 Piano roll, arrangement, mixer, sample browser, waveform editor, plugin hosting, MIDI input, undo/redo and advanced accessibility features are future milestones, **not interactive placeholders**.
+
+## Real application screenshot
+
+The public README includes a **capture from the real Rust app**, not an artist's rendering. The automated capture workflow builds the app in Linux, starts it with Xvfb, locates the visible application window, and captures its actual pixels. Physical speakers and file-dialog behavior are still separate desktop smoke tests.
+
+Capture source: `scripts/capture-screenshot.sh` and `.github/workflows/screenshot-preview.yml`.
 
 ## Follow-up accessibility work
 

@@ -11,7 +11,13 @@ LIRUVA is an independent, community-driven, **free and open-source** digital aud
 
 LIRUVA has its own original implementation, dark interface, and identity. It is **not affiliated with Image-Line or FL Studio**.
 
-## Development status — Milestone 2.1
+## A look at LIRUVA
+
+![LIRUVA dark desktop application running on Linux, showing the 16-step Kick, Snare, Hi-Hat and Clap sequencer](docs/screenshots/liruva-dark-studio.png)
+
+*Real screenshot of the Rust/egui desktop application running under a virtual Linux display. Captured automatically in [GitHub Actions](https://github.com/edujbarrios/liruva/actions/runs/38186742959)—not a concept render or an edited mockup. The virtual display has no physical audio output device, so the screenshot correctly shows “Audio unavailable.” Real speaker playback and native file dialogs still require desktop smoke testing.*
+
+## Development status — Milestone 2.2 (development branch)
 
 The following features are implemented **in this development branch**:
 
@@ -22,7 +28,7 @@ The following features are implemented **in this development branch**:
 - **Open**, **Save**, and **Save As** actions using native dialogs.
 - Versioned, human-readable `.liruva` project files storing a name, BPM, and all four patterns.
 - Validation of malformed or unsupported projects before loading them.
-- Warning before opening a project over unsaved changes.
+- **New Project** action and confirmation before discarding unsaved changes when opening, creating a new project, or closing the app.
 - GPL-3.0-or-later original source, English-only product copy, and automated Rust checks.
 
 **Not implemented:** piano roll, arrangement, MIDI editing, sample imports, plugins, WAV export, mixer, cloud services, or AI integration.
@@ -36,7 +42,8 @@ This is a small drum-machine prototype, **not a full DAW yet**. The sound, nativ
 3. Adjust **Tempo** to change the groove.
 4. Give the project a name and click **Save**.
 5. Quit LIRUVA, start it again, then click **Open** to restore the saved beat.
-6. Use **Save As** to create another copy, or **Clear all steps** to start again.
+6. Use **Save As** to create another copy, or **New** to start fresh.
+7. If you make changes and try to leave, choose **Save and continue**, **Discard changes**, or **Cancel**.
 
 Files are stored on your own computer as readable JSON with the `.liruva` extension. Read the [project format specification](docs/PROJECT_FORMAT.md) for details. No account, internet access, API key, or AI service is required.
 
@@ -56,11 +63,11 @@ On Linux, native file dialogs use XDG Desktop Portal (or a supported fallback). 
 ```bash
 git clone https://github.com/edujbarrios/liruva.git
 cd liruva
-git switch feat/milestone-2-1-project-files
+git switch feat/milestone-2-2-safety-and-screenshot
 cargo run -p liruva
 ```
 
-This development branch is part of stacked, unmerged PRs. The sequential branches are `feat/milestone-0-foundation`, `feat/milestone-1-audio-dark-ui`, `feat/milestone-1-2-drum-sequencer`, and `feat/milestone-2-1-project-files`.
+This development branch is part of stacked, unmerged PRs. The sequential branches are `feat/milestone-0-foundation`, `feat/milestone-1-audio-dark-ui`, `feat/milestone-1-2-drum-sequencer`, `feat/milestone-2-1-project-files`, and `feat/milestone-2-2-safety-and-screenshot`.
 
 Verify Rust code locally:
 

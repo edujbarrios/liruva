@@ -1,6 +1,6 @@
 # Architecture
 
-Status: **Milestone 2.1**. The drum sequencer now also supports validated, versioned local project files. The full DAW architecture remains a proposal.
+Status: **Milestone 2.2**. The drum sequencer now also supports validated, versioned local project files. The full DAW architecture remains a proposal.
 
 ## Philosophy
 
@@ -56,6 +56,10 @@ The project model in `src/project.rs` stores exactly four drum masks, tempo and 
 Native file dialogs are intentionally modal and run from the desktop UI event loop; they are not part of the audio callback. The format's first version does not include samples or plugin data.
 
 See [PROJECT_FORMAT.md](PROJECT_FORMAT.md).
+
+## Unsaved project handling
+
+The UI tracks unsaved edits and guards the Open, New, and window-close actions with a confirmation. A failed or canceled save must not automatically continue the destructive action. The existing sample-accurate audio callback remains separate from this UI-only workflow.
 
 ## Command model
 
