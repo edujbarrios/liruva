@@ -259,7 +259,7 @@ mod tests {
     fn unknown_versions_and_invalid_tempos_are_rejected() {
         let controls = AudioControls::default();
         let mut project = Project::from_controls("Test Pattern", &controls);
-        project.format_version = 2;
+        project.format_version = 3;
         assert!(project.validate().is_err());
         project.format_version = 2;
         project.bpm = 999;
