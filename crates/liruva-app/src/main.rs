@@ -680,8 +680,9 @@ impl eframe::App for LiruvaApp {
                 let shift = input.modifiers.shift;
                 (
                     command && !shift && input.key_pressed(egui::Key::Z),
-                    command && ((shift && input.key_pressed(egui::Key::Z))
-                        || input.key_pressed(egui::Key::Y)),
+                    command
+                        && ((shift && input.key_pressed(egui::Key::Z))
+                            || input.key_pressed(egui::Key::Y)),
                     input.key_pressed(egui::Key::Space),
                 )
             });
