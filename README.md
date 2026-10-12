@@ -23,7 +23,8 @@ The following features are implemented **in this development branch**:
 
 - Rust desktop app with an original, dark, Material-inspired design.
 - Four-track drum machine with 16 interactive steps.
-- Four original synthesized drum sounds: Kick, Snare, Hi-Hat, and Clap.\n- An interactive, scrollable two-octave piano roll (C4–B5), with a real locally synthesized melodic instrument.
+- Four original synthesized drum sounds: Kick, Snare, Hi-Hat, and Clap.
+- An interactive, scrollable two-octave piano roll (C4–B5), with a real locally synthesized melodic instrument.
 - Looping 4/4 playback with adjustable BPM, Play and Stop.
 - **Open**, **Save**, and **Save As** actions using native dialogs.
 - Versioned, human-readable `.liruva` project files storing a name, BPM, four drum patterns, and melody. Old version-1 projects open automatically and gain an empty melody.
@@ -38,7 +39,8 @@ This is an early music-making prototype, **not a full DAW yet**. The sound, nati
 ## Make your first beat
 
 1. Open LIRUVA and select steps for Kick, Snare, Hi-Hat or Clap.
-2. Add notes in **Piano Roll**, or select **Load demo melody** to hear a simple tune.\n3. Click **Play**. Drums and melody repeat in the same bar.
+2. Add notes in **Piano Roll**, or select **Load demo melody** to hear a simple tune.
+3. Click **Play**. Drums and melody repeat in the same bar.
 4. Adjust **Tempo** to change the groove.
 5. Give the project a name and click **Save**.
 6. Quit LIRUVA, start it again, then click **Open** to restore drums and melody.
