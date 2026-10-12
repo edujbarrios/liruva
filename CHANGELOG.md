@@ -2,6 +2,14 @@
 
 All notable project milestones will be documented here.
 
+## Unreleased — Milestone 2.2
+
+- Added New Project and unsaved-change confirmation on application exit.
+- Reused the same confirmation flow for Open and New.
+- Added Save-and-continue, Discard and Cancel actions.
+- Added overwrite and rejected-file persistence tests.
+- Added headless screenshot capture of the real dark LIRUVA desktop window for the README.
+
 ## Unreleased — Milestone 2.1
 
 - Added a documented, versioned, human-readable `.liruva` project format.
