@@ -9,11 +9,12 @@ use std::path::Path;
 use serde::{Deserialize, Serialize};
 
 use crate::audio::AudioControls;
-use crate::transport::TRACK_COUNT;
+use crate::melody::MELODY_PITCH_COUNT;
+use crate::transport::{STEPS_PER_BAR, TRACK_COUNT};
 
 pub const FILE_EXTENSION: &str = "liruva";
 const FILE_FORMAT: &str = "liruva-project";
-const FORMAT_VERSION: u32 = 1;
+const FORMAT_VERSION: u32 = 2;
 const MAX_PROJECT_BYTES: u64 = 64 * 1024;
 const MAX_NAME_LENGTH: usize = 80;
 
@@ -25,6 +26,23 @@ pub struct Project {
     pub name: String,
     pub bpm: u32,
     pub tracks: [u16; TRACK_COUNT],
+    pub melody: [Option<u8>; STEPS_PER_BAR],
+}
+
+#[derive(Deserialize)]
+struct ProjectHeader {
+    format: String,
+    format_version: u32,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct LegacyProject {
+    format: String,
+    format_version: u32,
+    name: String,
+    bpm: u32,
+    tracks: [u16; TRACK_COUNT],
 }
 
 impl Project {
@@ -35,6 +53,7 @@ impl Project {
             name: name.to_owned(),
             bpm: controls.bpm(),
             tracks: controls.pattern_masks(),
+            melody: controls.melody_notes(),
         }
     }
 
@@ -54,6 +73,14 @@ impl Project {
         {
             return Err("Project name must contain 1–80 printable characters.".to_owned());
         }
+        if self
+            .melody
+            .iter()
+            .flatten()
+            .any(|note| usize::from(*note) >= MELODY_PITCH_COUNT)
+        {
+            return Err("A melody note is outside the supported C4–B5 range.".to_owned());
+        }
         if !(40..=240).contains(&self.bpm) {
             return Err("Project tempo must be between 40 and 240 BPM.".to_owned());
         }
@@ -66,6 +93,7 @@ impl Project {
         controls.set_playing(false);
         controls.set_bpm(self.bpm);
         controls.set_pattern_masks(self.tracks);
+        controls.set_melody_notes(self.melody);
     }
 }
 
@@ -96,8 +124,33 @@ pub fn load_from_path(path: &Path) -> Result<Project, String> {
         return Err("Project file is larger than the supported 64 KiB limit.".to_owned());
     }
 
-    let project: Project =
+    let header: ProjectHeader =
         serde_json::from_slice(&data).map_err(|error| format!("Invalid project JSON: {error}"))?;
+    if header.format != FILE_FORMAT {
+        return Err("This is not a LIRUVA project file.".to_owned());
+    }
+    let project = match header.format_version {
+        1 => {
+            let legacy: LegacyProject = serde_json::from_slice(&data)
+                .map_err(|error| format!("Invalid legacy project JSON: {error}"))?;
+            if legacy.format_version != 1 {
+                return Err("Unsupported legacy project version.".to_owned());
+            }
+            Project {
+                format: legacy.format,
+                format_version: FORMAT_VERSION,
+                name: legacy.name,
+                bpm: legacy.bpm,
+                tracks: legacy.tracks,
+                melody: [None; STEPS_PER_BAR],
+            }
+        }
+        FORMAT_VERSION => serde_json::from_slice(&data)
+            .map_err(|error| format!("Invalid project JSON: {error}"))?,
+        version => {
+            return Err(format!("Unsupported LIRUVA project version: {version}."));
+        }
+    };
     project.validate()?;
     Ok(project)
 }
@@ -152,6 +205,7 @@ pub fn save_to_path(path: &Path, project: &Project) -> Result<(), String> {
 mod tests {
     use super::{Project, load_from_path, normalize_save_path, save_to_path};
     use crate::audio::AudioControls;
+    use crate::transport::STEPS_PER_BAR;
     use std::fs;
     use std::path::PathBuf;
     use std::time::{SystemTime, UNIX_EPOCH};
@@ -173,6 +227,8 @@ mod tests {
         controls.set_bpm(147);
         controls.toggle_step(1, 7);
         controls.toggle_step(3, 15);
+        controls.set_melody_note(0, Some(9));
+        controls.set_melody_note(12, Some(23));
         let expected = Project::from_controls("My First Beat", &controls);
         let path = test_path("roundtrip");
 
@@ -184,6 +240,7 @@ mod tests {
         decoded.apply(&fresh);
         assert_eq!(fresh.bpm(), 147);
         assert_eq!(fresh.pattern_masks(), controls.pattern_masks());
+        assert_eq!(fresh.melody_notes(), controls.melody_notes());
         fs::remove_file(path).expect("temporary project must be removable");
     }
 
@@ -202,14 +259,45 @@ mod tests {
     fn unknown_versions_and_invalid_tempos_are_rejected() {
         let controls = AudioControls::default();
         let mut project = Project::from_controls("Test Pattern", &controls);
-        project.format_version = 2;
+        project.format_version = 3;
         assert!(project.validate().is_err());
-        project.format_version = 1;
+        project.format_version = 2;
         project.bpm = 999;
         assert!(project.validate().is_err());
         project.bpm = 120;
         project.name = "  ".to_owned();
         assert!(project.validate().is_err());
+    }
+
+    #[test]
+    fn old_v1_drum_projects_migrate_to_v2_with_no_melody() {
+        let path = test_path("v1-migration");
+        let original = br#"{
+            "format": "liruva-project",
+            "format_version": 1,
+            "name": "My Old Beat",
+            "bpm": 95,
+            "tracks": [4369, 4112, 21845, 4096]
+        }"#;
+        fs::write(&path, original).expect("write legacy fixture");
+        let migrated = load_from_path(&path).expect("version 1 must open");
+        assert_eq!(migrated.format_version, 2);
+        assert_eq!(migrated.bpm, 95);
+        assert_eq!(migrated.tracks[0], 4369);
+        assert_eq!(migrated.melody, [None; STEPS_PER_BAR]);
+        fs::remove_file(path).expect("cleanup legacy fixture");
+    }
+
+    #[test]
+    fn out_of_range_melody_is_rejected_before_loading() {
+        let path = test_path("invalid-melody");
+        let controls = AudioControls::default();
+        let mut invalid = Project::from_controls("A Beat", &controls);
+        invalid.melody[1] = Some(24);
+        fs::write(&path, serde_json::to_vec(&invalid).expect("encode fixture"))
+            .expect("write fixture");
+        assert!(load_from_path(&path).is_err());
+        fs::remove_file(path).expect("cleanup invalid fixture");
     }
 
     #[test]

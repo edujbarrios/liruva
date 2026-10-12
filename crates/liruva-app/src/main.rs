@@ -2,6 +2,7 @@
 // Copyright (C) 2026 Eduardo J. Barrios and LIRUVA contributors.
 
 mod audio;
+mod melody;
 mod project;
 mod theme;
 mod transport;
@@ -13,6 +14,7 @@ use std::time::Duration;
 use eframe::egui;
 
 use crate::audio::AudioControls;
+use crate::melody::{MELODY_PITCH_COUNT, pitch_name};
 use crate::project::{Project, load_from_path, normalize_save_path, save_to_path};
 use crate::transport::{STEPS_PER_BAR, TRACK_COUNT, TRACK_NAMES};
 
@@ -132,6 +134,7 @@ impl LiruvaApp {
         self.controls.set_playing(false);
         self.controls.set_bpm(120);
         self.controls.load_starter_pattern();
+        self.controls.clear_melody();
         self.project_name = "Untitled Beat".to_owned();
         self.project_path = None;
         self.dirty = false;
@@ -232,7 +235,7 @@ impl LiruvaApp {
                 ui.add_space(8.0);
                 ui.colored_label(
                     theme::MUTED,
-                    "Four original drum sounds, one simple loop. Everything stays on your computer.",
+                    "Four drums and one melodic instrument. Everything stays on your computer.",
                 );
                 ui.add_space(20.0);
 
@@ -420,6 +423,103 @@ impl LiruvaApp {
                 });
             });
     }
+
+    fn show_piano_roll(&mut self, ui: &mut egui::Ui) {
+        egui::Frame::new()
+            .fill(theme::SURFACE)
+            .stroke((1.0, theme::BORDER))
+            .corner_radius(16)
+            .inner_margin(20)
+            .show(ui, |ui| {
+                ui.set_min_width(ui.available_width());
+                ui.horizontal(|ui| {
+                    ui.label(egui::RichText::new("PIANO ROLL").size(16.0).strong());
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                        ui.colored_label(theme::MUTED, "C4–B5 · ONE NOTE PER STEP");
+                    });
+                });
+                ui.add_space(7.0);
+                ui.colored_label(
+                    theme::MUTED,
+                    "Click a pitch and step to compose. Click it again to remove the note.",
+                );
+                ui.add_space(12.0);
+                let current_step = self.controls.current_step();
+                let width = ((ui.available_width() - 94.0 - 16.0 * 4.0) / 16.0).max(20.0);
+
+                egui::ScrollArea::vertical()
+                    .max_height(242.0)
+                    .show(ui, |ui| {
+                        for pitch in (0..MELODY_PITCH_COUNT).rev() {
+                            ui.horizontal(|ui| {
+                                ui.spacing_mut().item_spacing.x = 4.0;
+                                ui.add_sized(
+                                    [90.0, 25.0],
+                                    egui::Label::new(
+                                        egui::RichText::new(pitch_name(pitch))
+                                            .color(theme::FOREGROUND),
+                                    ),
+                                );
+                                for step in 0..STEPS_PER_BAR {
+                                    let active =
+                                        self.controls.melody_note(step) == Some(pitch as u8);
+                                    let background = if active {
+                                        theme::SUCCESS
+                                    } else {
+                                        theme::SURFACE_HIGH
+                                    };
+                                    let outline = if current_step == Some(step) {
+                                        (2.0, theme::FOREGROUND)
+                                    } else if step % 4 == 0 {
+                                        (1.0, theme::BORDER)
+                                    } else {
+                                        (0.0, theme::SURFACE)
+                                    };
+                                    let label = if active { "●" } else { "" };
+                                    let button = egui::Button::new(
+                                        egui::RichText::new(label).color(theme::BACKGROUND),
+                                    )
+                                    .fill(background)
+                                    .stroke(outline)
+                                    .corner_radius(4);
+
+                                    if ui
+                                        .add_sized([width, 25.0], button)
+                                        .on_hover_text(format!(
+                                            "{} — step {} — {}",
+                                            pitch_name(pitch),
+                                            step + 1,
+                                            if active { "remove note" } else { "set note" }
+                                        ))
+                                        .clicked()
+                                    {
+                                        self.controls.set_melody_note(
+                                            step,
+                                            if active { None } else { Some(pitch as u8) },
+                                        );
+                                        self.dirty = true;
+                                    }
+                                }
+                            });
+                        }
+                    });
+
+                ui.add_space(10.0);
+                ui.horizontal(|ui| {
+                    if ui.button("Load demo melody").clicked() {
+                        self.controls.load_demo_melody();
+                        self.dirty = true;
+                    }
+                    if ui.button("Clear melody").clicked() {
+                        self.controls.clear_melody();
+                        self.dirty = true;
+                    }
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                        ui.colored_label(theme::MUTED, "Scroll vertically to explore two octaves");
+                    });
+                });
+            });
+    }
 }
 
 impl eframe::App for LiruvaApp {
@@ -427,42 +527,46 @@ impl eframe::App for LiruvaApp {
         egui::CentralPanel::default()
             .frame(egui::Frame::new().fill(theme::BACKGROUND).inner_margin(22))
             .show(ui, |ui| {
-                ui.horizontal(|ui| {
-                    ui.vertical(|ui| {
-                        ui.label(
-                            egui::RichText::new("LIRUVA")
-                                .size(32.0)
-                                .strong()
-                                .color(theme::PRIMARY),
-                        );
-                        ui.colored_label(theme::MUTED, "Make music. Freely.");
+                egui::ScrollArea::vertical().show(ui, |ui| {
+                    ui.horizontal(|ui| {
+                        ui.vertical(|ui| {
+                            ui.label(
+                                egui::RichText::new("LIRUVA")
+                                    .size(32.0)
+                                    .strong()
+                                    .color(theme::PRIMARY),
+                            );
+                            ui.colored_label(theme::MUTED, "Make music. Freely.");
+                        });
+                        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                            ui.colored_label(theme::MUTED, "OPEN SOURCE / EARLY ALPHA");
+                        });
                     });
-                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                        ui.colored_label(theme::MUTED, "OPEN SOURCE / EARLY ALPHA");
-                    });
+
+                    ui.add_space(12.0);
+                    self.show_project_controls(ui);
+                    ui.add_space(15.0);
+                    self.show_transport(ui);
+                    ui.add_space(14.0);
+                    self.show_step_grid(ui);
+                    ui.add_space(14.0);
+                    self.show_piano_roll(ui);
+                    ui.add_space(17.0);
+                    ui.colored_label(
+                        theme::MUTED,
+                        "Save drums and melody together as open .liruva projects. No account or AI required.",
+                    );
+                    ui.add_space(8.0);
+                    ui.colored_label(theme::MUTED, MISSION);
+                    ui.hyperlink_to(
+                        "View the source code on GitHub",
+                        "https://github.com/edujbarrios/liruva",
+                    );
+
+                    if self.controls.is_playing() {
+                        ui.ctx().request_repaint_after(Duration::from_millis(40));
+                    }
                 });
-
-                ui.add_space(12.0);
-                self.show_project_controls(ui);
-                ui.add_space(15.0);
-                self.show_transport(ui);
-                ui.add_space(14.0);
-                self.show_step_grid(ui);
-                ui.add_space(17.0);
-                ui.colored_label(
-                    theme::MUTED,
-                    "Your patterns can now be saved as open .liruva files. No account or AI required.",
-                );
-                ui.add_space(8.0);
-                ui.colored_label(theme::MUTED, MISSION);
-                ui.hyperlink_to(
-                    "View the source code on GitHub",
-                    "https://github.com/edujbarrios/liruva",
-                );
-
-                if self.controls.is_playing() {
-                    ui.ctx().request_repaint_after(Duration::from_millis(40));
-                }
             });
 
         if ui.input(|input| input.viewport().close_requested()) && !self.allow_close && self.dirty {
@@ -513,8 +617,8 @@ fn main() -> eframe::Result {
     let options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
             .with_title("LIRUVA — Make music. Freely.")
-            .with_inner_size([1040.0, 850.0])
-            .with_min_inner_size([780.0, 680.0]),
+            .with_inner_size([1060.0, 1060.0])
+            .with_min_inner_size([780.0, 700.0]),
         ..Default::default()
     };
 

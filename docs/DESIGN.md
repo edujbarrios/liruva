@@ -44,9 +44,9 @@ Token definitions live in `crates/liruva-app/src/theme.rs`. Main surfaces use ro
 - The user can Save and continue, Discard changes, or Cancel.
 - Loading a malformed project never replaces the existing pattern.
 
-## Not built yet
+## Piano roll\n\nA compact, vertical-scroll note editor maps one note per sixteenth step across two octaves (C4–B5). Its playhead shares the drum machine's timing. Enabled notes are mint-colored and exposed through English labels and tooltips. The default state contains no melodic notes; a demo melody button provides a quick starting point.\n\n## Not built yet
 
-Piano roll, arrangement, mixer, sample browser, waveform editor, plugin hosting, MIDI input, undo/redo and advanced accessibility features are future milestones, **not interactive placeholders**.
+Advanced piano-roll editing, arrangement, mixer, sample browser, waveform editor, plugin hosting, MIDI input, undo/redo and advanced accessibility features are future milestones, **not interactive placeholders**.
 
 ## Real application screenshot
 
