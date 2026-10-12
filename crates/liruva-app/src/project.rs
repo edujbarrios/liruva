@@ -128,6 +128,9 @@ pub fn load_from_path(path: &Path) -> Result<Project, String> {
         1 => {
             let legacy: LegacyProject = serde_json::from_slice(&data)
                 .map_err(|error| format!("Invalid legacy project JSON: {error}"))?;
+            if legacy.format_version != 1 {
+                return Err("Unsupported legacy project version.".to_owned());
+            }
             Project {
                 format: legacy.format,
                 format_version: FORMAT_VERSION,
