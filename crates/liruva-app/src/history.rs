@@ -127,10 +127,13 @@ mod tests {
         history.record(first.clone(), &second);
 
         let previous = history.undo(second).expect("undo");
-        history.record(previous.clone(), &EditorState {
-            name: "Another edit".to_owned(),
-            ..previous
-        });
+        history.record(
+            previous.clone(),
+            &EditorState {
+                name: "Another edit".to_owned(),
+                ..previous
+            },
+        );
         assert!(!history.can_redo());
     }
 
