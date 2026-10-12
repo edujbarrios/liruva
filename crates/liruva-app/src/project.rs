@@ -221,6 +221,37 @@ mod tests {
     }
 
     #[test]
+    fn saving_again_replaces_an_existing_project_file() {
+        let path = test_path("overwrite");
+        let controls = AudioControls::default();
+        let original = Project::from_controls("First Beat", &controls);
+        save_to_path(&path, &original).expect("first save succeeds");
+
+        controls.clear_pattern();
+        controls.set_bpm(175);
+        let updated = Project::from_controls("Second Beat", &controls);
+        save_to_path(&path, &updated).expect("second save replaces the file");
+        assert_eq!(load_from_path(&path).expect("open updated file"), updated);
+        fs::remove_file(path).expect("temporary project cleanup");
+    }
+
+    #[test]
+    fn unsupported_projects_are_not_applied_to_the_audio_controls() {
+        let path = test_path("unsupported");
+        let controls = AudioControls::default();
+        controls.toggle_step(2, 7);
+        controls.set_bpm(133);
+        let before = Project::from_controls("Untitled Beat", &controls);
+        let mut unsupported = before.clone();
+        unsupported.format_version = 99;
+        let data = serde_json::to_vec(&unsupported).expect("serialize invalid fixture");
+        fs::write(&path, data).expect("write invalid fixture");
+        assert!(load_from_path(&path).is_err());
+        assert_eq!(Project::from_controls("Untitled Beat", &controls), before);
+        fs::remove_file(path).expect("temporary project cleanup");
+    }
+
+    #[test]
     fn extension_is_added_only_when_missing() {
         assert_eq!(
             normalize_save_path(std::path::Path::new("my-beat")),
