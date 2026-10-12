@@ -1,16 +1,17 @@
-# LIRUVA project format — version 1
+# LIRUVA project format — version 2
 
-LIRUVA saves patterns locally as UTF-8 JSON with the **`.liruva`** extension. The format is open, human-readable and covered by the same open-source project documentation.
+LIRUVA saves patterns locally as UTF-8 JSON with the **`.liruva`** extension. The format is open, human-readable and designed for offline use. Both drum patterns and melodic notes survive an app restart.
 
-## Example
+## Example (version 2)
 
 ```json
 {
   "format": "liruva-project",
-  "format_version": 1,
-  "name": "My First Beat",
+  "format_version": 2,
+  "name": "My First Song",
   "bpm": 120,
-  "tracks": [4369, 4112, 21845, 4096]
+  "tracks": [4369, 4112, 21845, 4096],
+  "melody": [0, null, null, null, 4, null, null, null, 7, null, null, null, 12, null, null, null]
 }
 ```
 
@@ -19,24 +20,30 @@ LIRUVA saves patterns locally as UTF-8 JSON with the **`.liruva`** extension. Th
 | Field | Type | Meaning |
 | --- | --- | --- |
 | `format` | string | Must be `liruva-project` |
-| `format_version` | integer | Must be `1` |
+| `format_version` | integer | Version 2 is written by this release |
 | `name` | string | Nonblank printable title, 1–80 characters |
-| `bpm` | integer | Tempo in beats per minute, range 40–240 |
-| `tracks` | array of four unsigned 16-bit integers | Kick, Snare, Hi-Hat, Clap in this fixed order |
+| `bpm` | integer | 40–240 beats per minute |
+| `tracks` | array of 4 unsigned 16-bit integers | Kick, Snare, Hi-Hat, Clap |
+| `melody` | array of 16 integers or null | One melodic pitch per sixteenth step, or a rest |
 
-Each track's integer is a 16-bit mask. Bit 0 represents step 1, bit 15 represents step 16. A set bit means that instrument plays at the corresponding sixteenth-note subdivision. Patterns loop through one 4/4 bar.
+Drum integers are bitmasks, with bit 0 = step 1 and bit 15 = step 16. For instance, four quarter-note kick hits use `0x1111` (decimal `4369`).
 
-For example, a kick playing steps 1, 5, 9 and 13 uses mask `0x1111` (decimal `4369`).
+Melody uses pitch indices `0`–`23` corresponding to chromatic semitones from **C4** (MIDI note 60) through **B5** (MIDI note 83); `null` means no new note is triggered at that step. Only one note per step is supported in the initial piano roll. Melodic audio is synthesized locally with no external samples.
 
-## Compatibility and safety
+## Backward compatibility
 
-- Files with unknown format versions, invalid BPM values, malformed JSON, invalid arrays or unexpected keys are rejected with a user-facing error.
-- Loading is validated **before** replacing the pattern. A rejected file leaves the current session unchanged.
-- Opening a valid file stops transport, sets the saved BPM and updates all four tracks.
-- Save first writes a temporary sibling file, flushes it, then renames to the final path. An error does not intentionally overwrite the original file with incomplete data.
-- The loader reads no more than 64 KiB.
-- No samples, external URLs, secrets, plugins, account identifiers or AI settings are stored.
-- Cross-version migrations are **not** implemented yet. Unknown versions are rejected instead of guessed at.
-- No project import or export to proprietary `.flp` format is implemented.
+- **Version 1** drum-only files can be opened. They are migrated into an in-memory version-2 project with an empty melody.
+- Saving a migrated project writes version 2. The original file is not changed merely by opening it.
+- Unknown future versions are refused rather than guessed.
 
-The project format is a deliberately small first step. Future versions may add arrangement, instruments and compatibility migrations without requiring proprietary services.
+## Security and resilience
+
+- Validate the entire project before modifying tempo, drum patterns, or melody.
+- Reject invalid format identifiers, array sizes, note indices, unknown fields and malformed JSON.
+- Read at most 64 KiB.
+- Use a temporary sibling file, synchronize it and rename it over the chosen destination when saving.
+- Loading a valid project stops the transport; a failed load leaves the current session untouched.
+- No plugin state, accounts, third-party samples, online URLs, secrets or AI data are included.
+- No proprietary FL Studio project import/export is implemented.
+
+The schema will evolve with explicit version increments and migrations when genuinely new musical features require it.
