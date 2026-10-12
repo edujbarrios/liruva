@@ -70,7 +70,7 @@ cd liruva
 cargo run -p liruva
 ```
 
-Milestones 0 through 3.1 have been merged into `main`. Milestone 3.2 is in a separate reviewable pull request until its checks pass.
+Milestones 0 through 3.2 are merged into `main`. Development continues through small, independently tested pull requests.
 
 Verify Rust code locally:
 

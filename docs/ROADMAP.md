@@ -10,7 +10,7 @@ Every feature must work offline without AI. The entire interface, code documenta
 | 2.1 — Project files | Versioned JSON, Save/Open and validation | Merged into main |
 | 2.2 — Safe editing | New Project, unsaved-change guards, real GUI screenshot | Merged into main |
 | 3.1 — First melody | C4–B5 piano roll, local synth, saved notes and v1 migration | Merged into main |
-| 3.2 — Safe editing | Undo/Redo for beat, melody, BPM, and project name | In review |
+| 3.2 — Safe editing | Undo/Redo for beat, melody, BPM, and project name | Merged into main |
 | 3.3 — Notes refinement | Note lengths, multiple patterns and keyboard editing | Planned |
 | 4 — Arrangement | Repeatable patterns on an intuitive timeline | Planned |
 | 5 — Export | Offline WAV rendering | Planned |
