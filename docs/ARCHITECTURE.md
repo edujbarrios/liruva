@@ -1,6 +1,6 @@
 # Architecture
 
-Status: **Milestone 0 proposal**. Only the desktop shell is implemented today.
+Status: **Milestone 1.1**. A first audio slice exists alongside the dark desktop UI; the full DAW architecture is still a proposal.
 
 ## Philosophy
 
@@ -10,10 +10,13 @@ The smallest usable musical workflow wins. The interface should reveal complexit
 
 ```text
 Cargo workspace
-└── crates/liruva-app/      Native desktop shell using Rust + eframe/egui
+└── crates/liruva-app/      Native dark desktop UI (egui/eframe)
+    └── src/audio.rs       CPAL stream, real kick synthesis, atomics
+    └── src/transport.rs   Deterministic musical clock (no audio hardware)
+    └── src/theme.rs       LIRUVA design tokens
 ```
 
-The UI currently displays static, truthful project status. It does not generate audio.
+The UI has a working transport connected to a CPAL output callback. A locally synthesized kick is generated in the callback, and playback is controlled with atomics. No audio is produced until Play is pressed.
 
 ## Planned separation (not implemented)
 
@@ -51,6 +54,6 @@ Once editing exists, both manual UI and optional AI operations must call the sam
 
 ## Simplicity constraints
 
-Initial product flow: **Create → Arrange → Export**.
+Initial product flow: **Create → Arrange → Export**. See [the design system](DESIGN.md).
 
 Keep the step sequencer and piano roll discoverable. Avoid mimicking complex menus from existing products. Accessibility (labels, keyboard navigation, readable contrast) is a design requirement.

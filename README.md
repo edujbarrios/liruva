@@ -11,16 +11,18 @@ LIRUVA is an independent, community-driven, **free and open-source** digital aud
 
 The goal is simple: make producing music approachable. We are inspired by the familiar creative workflows of existing DAWs, but LIRUVA has its own identity, implementation, and interface. **It is not affiliated with Image-Line or FL Studio.**
 
-## Current status: Milestone 0 — foundation
+## Current status: Milestone 1.1 — first sound (development branch)
 
 **Implemented in this branch:**
-- Rust workspace and a native desktop welcome screen.
-- Project mission, open-source license, contribution guidelines, and architecture notes.
-- GitHub Actions checks for formatting, linting, and compilation/tests.
+- Rust workspace and original dark Material-inspired interface.
+- Actual synthesized kick drum on each beat, with Play/Stop and adjustable BPM.
+- Thread-safe transport controls and a separate, testable beat clock.
+- Visible error status when no audio output device is available.
+- Project mission, GPL license, contribution guidelines, architecture notes and CI.
 
-**Not implemented yet:** audio playback, step sequencer, piano roll, arrangement, samples, plugins, project saving, audio export, and AI tools.
+**Not implemented yet:** 16-step sequencer, multiple drum channels, piano roll, arrangement, samples, plugins, project saving, WAV export and AI tools.
 
-This is not yet music production software. Nothing in the welcome screen pretends to play or edit music.
+This is an early playable prototype, not yet a full DAW. Audio device playback must still be checked manually on supported desktop platforms. See [design guide](docs/DESIGN.md).
 
 ## Build and run
 
@@ -30,7 +32,7 @@ On Ubuntu/Debian:
 
 ```bash
 sudo apt-get update
-sudo apt-get install -y build-essential pkg-config libgtk-3-dev libxkbcommon-dev libwayland-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev libssl-dev
+sudo apt-get install -y build-essential pkg-config libgtk-3-dev libxkbcommon-dev libwayland-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev libssl-dev libasound2-dev
 ```
 
 On Windows and macOS, install Rust and your platform's native development tooling.
@@ -41,7 +43,7 @@ cd liruva
 cargo run -p liruva
 ```
 
-Once this foundation PR is merged, these commands will work from `main`. Until then, check out the `feat/milestone-0-foundation` branch after cloning.
+These changes are under review in stacked Pull Requests. For this feature, check out `feat/milestone-1-audio-dark-ui` after cloning. To run the original non-audio foundation instead, check out `feat/milestone-0-foundation`.
 
 Check code locally:
 
@@ -51,7 +53,7 @@ cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
 ```
 
-The GUI requires a graphical desktop environment; it is not intended to launch in headless CI. Windows and macOS runtime builds have not yet been verified.
+The GUI and audio device need a real desktop environment; CI can run Rust checks but cannot verify whether a physical speaker produces sound. Windows and macOS runtime builds have not yet been verified.
 
 ## Development principles
 
