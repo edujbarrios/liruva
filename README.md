@@ -17,7 +17,7 @@ LIRUVA has its own original implementation, dark interface, and identity. It is 
 
 *Real screenshot of the Rust/egui desktop application running under a virtual Linux display. Captured automatically in [GitHub Actions](https://github.com/edujbarrios/liruva/actions/runs/38187972064)—not a concept render or an edited mockup. The virtual display has no physical audio output device, so the screenshot correctly shows “Audio unavailable.” Real speaker playback and native file dialogs still require desktop smoke testing.*
 
-## Development status — Early alpha (Milestone 3.1)
+## Development status — Early alpha (Milestone 3.2)
 
 The following features are available in the **main branch**:
 
@@ -26,6 +26,7 @@ The following features are available in the **main branch**:
 - Four original synthesized drum sounds: Kick, Snare, Hi-Hat, and Clap.
 - An interactive, scrollable two-octave piano roll (C4–B5), with a real locally synthesized melodic instrument.
 - Looping 4/4 playback with adjustable BPM, Play and Stop.
+- **Undo and Redo** for drum hits, piano-roll notes, tempo changes, and project names. Includes keyboard shortcuts and a bounded 64-step edit history.
 - **Open**, **Save**, and **Save As** actions using native dialogs.
 - Versioned, human-readable `.liruva` project files storing a name, BPM, four drum patterns, and melody. Old version-1 projects open automatically and gain an empty melody.
 - Validation of malformed or unsupported projects before loading them.
@@ -45,7 +46,8 @@ This is an early music-making prototype, **not a full DAW yet**. The sound, nati
 5. Give the project a name and click **Save**.
 6. Quit LIRUVA, start it again, then click **Open** to restore drums and melody.
 7. Use **Save As** to create another copy, or **New** to start fresh.
-8. If you make changes and try to leave, choose **Save and continue**, **Discard changes**, or **Cancel**.
+8. Use **Undo** and **Redo** (Ctrl/Cmd+Z, Ctrl/Cmd+Shift+Z, or Ctrl/Cmd+Y) to experiment without losing your edits.
+9. If you make changes and try to leave, choose **Save and continue**, **Discard changes**, or **Cancel**.
 
 Files are stored on your own computer as readable JSON with the `.liruva` extension. Read the [project format specification](docs/PROJECT_FORMAT.md) for details. No account, internet access, API key, or AI service is required.
 
@@ -68,7 +70,7 @@ cd liruva
 cargo run -p liruva
 ```
 
-Milestones 0 through 3.1 have been merged into `main`. Development continues incrementally through reviewable pull requests.
+Milestones 0 through 3.1 have been merged into `main`. Milestone 3.2 is in a separate reviewable pull request until its checks pass.
 
 Verify Rust code locally:
 
