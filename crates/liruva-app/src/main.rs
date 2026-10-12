@@ -2,15 +2,18 @@
 // Copyright (C) 2026 Eduardo J. Barrios and LIRUVA contributors.
 
 mod audio;
+mod project;
 mod theme;
 mod transport;
 
+use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::Duration;
 
 use eframe::egui;
 
 use crate::audio::AudioControls;
+use crate::project::{Project, load_from_path, normalize_save_path, save_to_path};
 use crate::transport::{STEPS_PER_BAR, TRACK_COUNT, TRACK_NAMES};
 
 const MISSION: &str = "In the AI music era, let's make music production tools accessible, intuitive, and free for everyone.";
@@ -19,6 +22,11 @@ struct LiruvaApp {
     controls: Arc<AudioControls>,
     _stream: Option<cpal::Stream>,
     audio_error: Option<String>,
+    project_name: String,
+    project_path: Option<PathBuf>,
+    dirty: bool,
+    confirm_open: bool,
+    project_notice: Option<(bool, String)>,
 }
 
 impl LiruvaApp {
@@ -34,7 +42,135 @@ impl LiruvaApp {
             controls,
             _stream: stream,
             audio_error,
+            project_name: "Untitled Beat".to_owned(),
+            project_path: None,
+            dirty: false,
+            confirm_open: false,
+            project_notice: None,
         }
+    }
+
+    fn file_dialog(&self, title: &str) -> rfd::FileDialog {
+        let dialog = rfd::FileDialog::new()
+            .add_filter("LIRUVA project", &[project::FILE_EXTENSION])
+            .set_title(title);
+        if let Some(parent) = self.project_path.as_ref().and_then(|path| path.parent()) {
+            dialog.set_directory(parent)
+        } else {
+            dialog
+        }
+    }
+
+    fn save_project(&mut self, save_as: bool) {
+        let path = if !save_as {
+            self.project_path.clone().or_else(|| {
+                self.file_dialog("Save LIRUVA project")
+                    .set_file_name("my-beat.liruva")
+                    .save_file()
+            })
+        } else {
+            let suggested = self
+                .project_path
+                .as_ref()
+                .and_then(|path| path.file_name())
+                .map(|name| name.to_string_lossy().into_owned())
+                .unwrap_or_else(|| "my-beat.liruva".to_owned());
+            self.file_dialog("Save LIRUVA project as")
+                .set_file_name(suggested)
+                .save_file()
+        };
+
+        let Some(path) = path else {
+            return;
+        };
+
+        let path = normalize_save_path(&path);
+        let file = Project::from_controls(&self.project_name, &self.controls);
+        match save_to_path(&path, &file) {
+            Ok(()) => {
+                self.project_path = Some(path);
+                self.dirty = false;
+                self.project_notice = Some((true, "Project saved successfully.".to_owned()));
+            }
+            Err(error) => self.project_notice = Some((false, error)),
+        }
+    }
+
+    fn open_project(&mut self) {
+        let Some(path) = self.file_dialog("Open LIRUVA project").pick_file() else {
+            return;
+        };
+
+        match load_from_path(&path) {
+            Ok(project) => {
+                project.apply(&self.controls);
+                self.project_name = project.name;
+                self.project_path = Some(path);
+                self.dirty = false;
+                self.project_notice = Some((true, "Project opened successfully.".to_owned()));
+            }
+            Err(error) => {
+                self.project_notice = Some((false, error));
+            }
+        }
+    }
+
+    fn show_project_controls(&mut self, ui: &mut egui::Ui) {
+        egui::Frame::new()
+            .fill(theme::SURFACE_HIGH)
+            .corner_radius(12)
+            .inner_margin(14)
+            .show(ui, |ui| {
+                ui.set_min_width(ui.available_width());
+                ui.horizontal(|ui| {
+                    ui.colored_label(theme::MUTED, "PROJECT");
+                    if ui
+                        .add(
+                            egui::TextEdit::singleline(&mut self.project_name)
+                                .desired_width(180.0)
+                                .hint_text("Project name"),
+                        )
+                        .changed()
+                    {
+                        self.dirty = true;
+                    }
+
+                    if ui.button("Save").clicked() {
+                        self.save_project(false);
+                    }
+                    if ui.button("Save As…").clicked() {
+                        self.save_project(true);
+                    }
+                    if ui.button("Open…").clicked() {
+                        if self.dirty {
+                            self.confirm_open = true;
+                        } else {
+                            self.open_project();
+                        }
+                    }
+
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                        let label = if self.dirty {
+                            "● Unsaved changes"
+                        } else {
+                            "✓ Up to date"
+                        };
+                        ui.colored_label(theme::MUTED, label);
+                    });
+                });
+
+                if let Some((success, message)) = &self.project_notice {
+                    ui.add_space(5.0);
+                    ui.colored_label(
+                        if *success {
+                            theme::SUCCESS
+                        } else {
+                            theme::PRIMARY
+                        },
+                        message,
+                    );
+                }
+            });
     }
 
     fn show_transport(&mut self, ui: &mut egui::Ui) {
@@ -100,6 +236,7 @@ impl LiruvaApp {
                             .changed()
                         {
                             self.controls.set_bpm(bpm);
+                            self.dirty = true;
                         }
                     });
                 });
@@ -219,6 +356,7 @@ impl LiruvaApp {
                                 .clicked()
                             {
                                 self.controls.toggle_step(track, step);
+                                self.dirty = true;
                             }
                         }
                     });
@@ -229,9 +367,11 @@ impl LiruvaApp {
                 ui.horizontal(|ui| {
                     if ui.button("Load starter beat").clicked() {
                         self.controls.load_starter_pattern();
+                        self.dirty = true;
                     }
                     if ui.button("Clear all steps").clicked() {
                         self.controls.clear_pattern();
+                        self.dirty = true;
                     }
                     ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                         ui.colored_label(theme::MUTED, "Outlined column = current playhead");
@@ -261,14 +401,16 @@ impl eframe::App for LiruvaApp {
                     });
                 });
 
-                ui.add_space(18.0);
+                ui.add_space(12.0);
+                self.show_project_controls(ui);
+                ui.add_space(15.0);
                 self.show_transport(ui);
                 ui.add_space(14.0);
                 self.show_step_grid(ui);
                 ui.add_space(17.0);
                 ui.colored_label(
                     theme::MUTED,
-                    "Next milestone: save and reopen your patterns. No account or AI required.",
+                    "Your patterns can now be saved as open .liruva files. No account or AI required.",
                 );
                 ui.add_space(8.0);
                 ui.colored_label(theme::MUTED, MISSION);
@@ -281,6 +423,33 @@ impl eframe::App for LiruvaApp {
                     ui.ctx().request_repaint_after(Duration::from_millis(40));
                 }
             });
+
+        if self.confirm_open {
+            egui::Window::new("Unsaved changes")
+                .collapsible(false)
+                .resizable(false)
+                .show(ui.ctx(), |ui| {
+                    ui.label("Opening a project will replace the current unsaved pattern.");
+                    ui.label("Save your current project first if you want to keep it.");
+                    ui.add_space(10.0);
+                    ui.horizontal(|ui| {
+                        if ui.button("Cancel").clicked() {
+                            self.confirm_open = false;
+                        }
+                        if ui.button("Open without saving").clicked() {
+                            self.confirm_open = false;
+                            self.open_project();
+                        }
+                    });
+                });
+        }
+
+        if self._stream.is_some()
+            && !ui.ctx().egui_wants_keyboard_input()
+            && ui.input(|input| input.key_pressed(egui::Key::Space))
+        {
+            self.controls.set_playing(!self.controls.is_playing());
+        }
     }
 }
 
@@ -288,8 +457,8 @@ fn main() -> eframe::Result {
     let options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
             .with_title("LIRUVA — Make music. Freely.")
-            .with_inner_size([1040.0, 760.0])
-            .with_min_inner_size([780.0, 640.0]),
+            .with_inner_size([1040.0, 850.0])
+            .with_min_inner_size([780.0, 680.0]),
         ..Default::default()
     };
 

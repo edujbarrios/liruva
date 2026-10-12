@@ -8,6 +8,9 @@ LIRUVA's original source is GPL-3.0-or-later. Every third-party crate, bundled s
 | --- | --- | --- | --- |
 | [eframe/egui](https://github.com/emilk/egui) | 0.36.2 | MIT OR Apache-2.0 | Native desktop UI |
 | [CPAL](https://github.com/RustAudio/cpal) | 0.18.2 | Apache-2.0 | Native audio output |
+| [serde](https://github.com/serde-rs/serde) | 1.0.229 | MIT OR Apache-2.0 | Versioned project model |
+| [serde_json](https://github.com/serde-rs/json) | 1.0.152 | MIT OR Apache-2.0 | Readable JSON project files |
+| [rfd](https://github.com/PolyMeilex/rfd) | 0.17.2 | MIT | Native Open/Save file dialogs |
 
 The direct versions and licenses above have been checked against upstream crate metadata. This is **not** a complete audit of all transitive dependencies; maintainers must review the resolved Cargo dependency tree before distributing binaries.
 

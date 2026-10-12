@@ -81,6 +81,16 @@ impl AudioControls {
         }
     }
 
+    pub fn pattern_masks(&self) -> [u16; TRACK_COUNT] {
+        std::array::from_fn(|track| self.patterns[track].load(Ordering::Acquire))
+    }
+
+    pub fn set_pattern_masks(&self, masks: [u16; TRACK_COUNT]) {
+        for (track, mask) in self.patterns.iter().zip(masks) {
+            track.store(mask, Ordering::Release);
+        }
+    }
+
     pub fn clear_pattern(&self) {
         for track in &self.patterns {
             track.store(0, Ordering::Release);

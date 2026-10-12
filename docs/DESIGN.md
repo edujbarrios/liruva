@@ -1,44 +1,52 @@
-# LIRUVA Design System — Dark Studio
+# LIRUVA design system — Dark Studio
 
-LIRUVA has an original dark design language inspired by the clarity of Material Design and the efficiency of modern music-production interfaces. It does **not** use FL Studio assets, branding, icons, or copied visual layouts.
+LIRUVA has its own original dark design language, inspired by the clarity and progressive disclosure of Material Design and the efficiency of modern music-production software. It does **not** copy FL Studio's branding, graphics, or interface assets.
 
-## Design principles\n\n**Product language: English.** All UI labels, accessibility text, tooltips, errors, documentation, issues, and pull requests are written in English. No translation system is included yet.
+**Product language: English.** UI labels, warnings, tooltips, documentation, GitHub issues, and pull requests use English.
 
-1. **Dark by default**: reduce visual fatigue during long music sessions without obscuring interactive controls.
-2. **Make the first action obvious**: one primary action per work area.
-3. **Musicians over menus**: progressively disclose advanced features instead of showing all controls.
-4. **Every control works**: do not display nonfunctional mixer knobs, audio waveforms, or play icons.
-5. **Accessible contrast**: labels remain legible, primary and warning states are distinguishable, keyboard actions are discoverable.
-6. **Original product identity**: LIRUVA uses its own typography treatment, warm accent and rounded surface structure.
-7. **No mandatory AI**: music must always be possible without AI tools.
+## Core principles
 
-## Current palette
+1. **Dark by default:** reduce visual fatigue without sacrificing contrast.
+2. **One obvious next action:** beginners should see how to start.
+3. **Musicians over menus:** avoid extensive settings and unexplained controls.
+4. **Every control is real:** no fake mixer knobs, transport controls, or buttons.
+5. **Accessible UI:** readable labels, keyboard-focusable controls, visible selection and progress.
+6. **Original identity:** warm accent colors, clear surfaces and intuitive rhythm visualization.
+7. **AI is optional:** full basic music creation works offline without AI.
+
+## Palette
 
 | Token | Hex | Role |
 | --- | --- | --- |
-| Background | `#11141A` | Window |
-| Surface | `#1D212A` | Cards and transport |
-| Raised surface | `#272C37` | Secondary card |
+| Background | `#11141A` | Application background |
+| Surface | `#1D212A` | Main panels |
+| Raised surface | `#272C37` | Project strip and secondary surfaces |
 | Border | `#3E4451` | Subtle outlines |
-| Primary | `#FFA751` | Main action, selected control |
+| Primary | `#FFA751` | Main action and selected control |
 | Foreground | `#EEF2F7` | Main text |
 | Muted | `#A6AFBC` | Supporting text |
-| Success | `#71DEB0` | Ready/playing indicator |\n| Kick | `#FFA751` | Warm amber |\n| Snare | `#79B5FF` | Soft blue |\n| Hi-Hat | `#71DEB0` | Mint |\n| Clap | `#C797FF` | Violet |
+| Success | `#71DEB0` | Ready / playing / saved |
+| Kick | `#FFA751` | Amber |
+| Snare | `#79B5FF` | Blue |
+| Hi-Hat | `#71DEB0` | Mint |
+| Clap | `#C797FF` | Violet |
 
-Use corners of 12–18 logical pixels, with generous spacing. Token values live in `crates/liruva-app/src/theme.rs`.
+Token definitions live in `crates/liruva-app/src/theme.rs`. Main surfaces use rounded corners of about 12–18 logical pixels.
 
-## Current real behavior
+## Current interactions
 
-- Play and Stop control four locally synthesized drum sounds (Kick, Snare, Hi-Hat, Clap).
-- The BPM slider affects the 16-step looping rhythm.
-- Playback state, current step and triggered step count are read from the audio callback.
-- Each numbered step is a clickable, keyboard-focusable button. Toggle sounds without stopping playback.
-- A clear error explains when no compatible audio device is available.
+- Click numbered step buttons to enable or disable each instrument.
+- Play and Stop start and stop locally synthesized drum audio.
+- Tempo adjusts sixteenth-note playback timing.
+- The current step is outlined using the actual audio clock state.
+- Save, Save As and Open use native dialogs, with plain-English error messages.
+- When a user tries to open another project with unsaved changes, LIRUVA asks for confirmation.
+- Loading a malformed project never replaces the existing pattern.
 
-## Not built
+## Not built yet
 
-The 16-step grid, four drum sounds, instrument browsers, piano roll, playlist, mixer, and visual peak meter do not exist yet. Mockups are not features. Do not render interactive-looking placeholders for these areas.
+Piano roll, arrangement, mixer, sample browser, waveform editor, plugin hosting, MIDI input, undo/redo and advanced accessibility features are future milestones, **not interactive placeholders**.
 
-## Accessibility to improve later
+## Follow-up accessibility work
 
-Keyboard focus indication and screen-reader labels need end-to-end testing on Windows, macOS and Linux. High-contrast color testing and non-color status cues must continue as the UI expands.
+Test the native file dialogs and screen readers on Windows, macOS and Linux. Add a high-contrast mode and full keyboard navigation as dedicated, tested improvements. Avoid using color as the only way to indicate state.

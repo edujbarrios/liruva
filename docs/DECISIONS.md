@@ -27,3 +27,19 @@ These are starting decisions, not promises that cannot evolve.
 **Decision:** Begin with a single binary package; separate audio, timing, serialization, and commands when they become real.
 
 **Why:** Avoid premature abstraction while planning safe real-time separation.
+
+## ADR-0005 — Open, offline project format
+
+**Decision:** Save one-bar drum patterns in a small, documented, versioned JSON file with the `.liruva` extension. Store BPM, four percussion masks and a display name. Use serde for reading/writing and rfd for native local file dialogs.
+
+**Why:** Beginners can keep their work without accounts, subscriptions or opaque proprietary projects. This also allows community tooling and future migration.
+
+**Tradeoff:** More complex arrangements and compatibility migrations are postponed until the basic persistence workflow is tested.
+
+**Safety:** All validation completes before playback state changes. Disk I/O happens outside the real-time audio callback. Existing files are not intentionally replaced by partially written output.
+
+## ADR-0006 — English-first product language
+
+**Decision:** UI, accessibility copy, documentation and GitHub collaboration use English. Localization is postponed and can be added as a distinct milestone.
+
+**Why:** One consistent language lowers initial maintenance overhead while preserving the ability to translate later.
