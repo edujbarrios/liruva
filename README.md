@@ -15,7 +15,7 @@ LIRUVA has its own original implementation, dark interface, and identity. It is 
 
 ![LIRUVA dark desktop application running on Linux, showing the 16-step drum sequencer and melodic piano roll](docs/screenshots/liruva-dark-studio.png)
 
-*Real screenshot of the Rust/egui desktop application running under a virtual Linux display. Captured automatically in [GitHub Actions](https://github.com/edujbarrios/liruva/actions/runs/38187972064)—not a concept render or an edited mockup. The virtual display has no physical audio output device, so the screenshot correctly shows “Audio unavailable.” Real speaker playback and native file dialogs still require desktop smoke testing.*
+*Real screenshot of the Rust/egui desktop application running under a virtual Linux display. Captured automatically in [GitHub Actions](https://github.com/edujbarrios/liruva/actions/runs/38319643985)—not a concept render or an edited mockup. The virtual display has no physical audio output device, so the screenshot correctly shows “Audio unavailable.” Real speaker playback and native file dialogs still require desktop smoke testing.*
 
 ## Development status — Early alpha (Milestone 3.2)
 
