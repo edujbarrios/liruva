@@ -8,10 +8,10 @@ permissions:
 
 jobs:
   capture:
-    # Only allow screenshot extraction on this first-party development branch.
+    # Capture genuine UI for first-party milestone PRs; exclude forks.
     if: >
       github.event.pull_request.head.repo.full_name == github.repository &&
-      (github.head_ref == 'feat/milestone-2-2-safety-and-screenshot' || github.head_ref == 'feat/milestone-3-1-melody-piano-roll')
+      startsWith(github.head_ref, 'feat/milestone-')
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
