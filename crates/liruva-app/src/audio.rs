@@ -101,7 +101,8 @@ impl AudioControls {
 
     pub fn set_melody_note(&self, step: usize, note: Option<u8>) {
         if step < STEPS_PER_BAR {
-            let encoded = note.filter(|pitch| usize::from(*pitch) < MELODY_PITCH_COUNT)
+            let encoded = note
+                .filter(|pitch| usize::from(*pitch) < MELODY_PITCH_COUNT)
                 .unwrap_or(NO_NOTE);
             self.melody[step].store(encoded, Ordering::Release);
         }
@@ -517,7 +518,11 @@ mod tests {
         let mut engine = DrumEngine::new(48_000);
         let output: Vec<_> = (0..2_000).map(|_| engine.next(&controls)).collect();
         assert!(output.iter().any(|sample| sample.abs() > 0.02));
-        assert!(output.iter().all(|sample| sample.is_finite() && sample.abs() <= 1.0));
+        assert!(
+            output
+                .iter()
+                .all(|sample| sample.is_finite() && sample.abs() <= 1.0)
+        );
         controls.set_playing(false);
         assert_eq!(engine.next(&controls), 0.0);
     }

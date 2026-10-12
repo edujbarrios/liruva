@@ -73,7 +73,12 @@ impl Project {
         {
             return Err("Project name must contain 1–80 printable characters.".to_owned());
         }
-        if self.melody.iter().flatten().any(|note| usize::from(*note) >= MELODY_PITCH_COUNT) {
+        if self
+            .melody
+            .iter()
+            .flatten()
+            .any(|note| usize::from(*note) >= MELODY_PITCH_COUNT)
+        {
             return Err("A melody note is outside the supported C4–B5 range.".to_owned());
         }
         if !(40..=240).contains(&self.bpm) {

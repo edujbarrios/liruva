@@ -447,59 +447,62 @@ impl LiruvaApp {
                 let current_step = self.controls.current_step();
                 let width = ((ui.available_width() - 94.0 - 16.0 * 4.0) / 16.0).max(20.0);
 
-                egui::ScrollArea::vertical().max_height(242.0).show(ui, |ui| {
-                    for pitch in (0..MELODY_PITCH_COUNT).rev() {
-                        ui.horizontal(|ui| {
-                            ui.spacing_mut().item_spacing.x = 4.0;
-                            ui.add_sized(
-                                [90.0, 25.0],
-                                egui::Label::new(
-                                    egui::RichText::new(pitch_name(pitch))
-                                        .color(theme::FOREGROUND),
-                                ),
-                            );
-                            for step in 0..STEPS_PER_BAR {
-                                let active = self.controls.melody_note(step) == Some(pitch as u8);
-                                let background = if active {
-                                    theme::SUCCESS
-                                } else {
-                                    theme::SURFACE_HIGH
-                                };
-                                let outline = if current_step == Some(step) {
-                                    (2.0, theme::FOREGROUND)
-                                } else if step % 4 == 0 {
-                                    (1.0, theme::BORDER)
-                                } else {
-                                    (0.0, theme::SURFACE)
-                                };
-                                let label = if active { "●" } else { "" };
-                                let button = egui::Button::new(
-                                    egui::RichText::new(label).color(theme::BACKGROUND),
-                                )
-                                .fill(background)
-                                .stroke(outline)
-                                .corner_radius(4);
+                egui::ScrollArea::vertical()
+                    .max_height(242.0)
+                    .show(ui, |ui| {
+                        for pitch in (0..MELODY_PITCH_COUNT).rev() {
+                            ui.horizontal(|ui| {
+                                ui.spacing_mut().item_spacing.x = 4.0;
+                                ui.add_sized(
+                                    [90.0, 25.0],
+                                    egui::Label::new(
+                                        egui::RichText::new(pitch_name(pitch))
+                                            .color(theme::FOREGROUND),
+                                    ),
+                                );
+                                for step in 0..STEPS_PER_BAR {
+                                    let active =
+                                        self.controls.melody_note(step) == Some(pitch as u8);
+                                    let background = if active {
+                                        theme::SUCCESS
+                                    } else {
+                                        theme::SURFACE_HIGH
+                                    };
+                                    let outline = if current_step == Some(step) {
+                                        (2.0, theme::FOREGROUND)
+                                    } else if step % 4 == 0 {
+                                        (1.0, theme::BORDER)
+                                    } else {
+                                        (0.0, theme::SURFACE)
+                                    };
+                                    let label = if active { "●" } else { "" };
+                                    let button = egui::Button::new(
+                                        egui::RichText::new(label).color(theme::BACKGROUND),
+                                    )
+                                    .fill(background)
+                                    .stroke(outline)
+                                    .corner_radius(4);
 
-                                if ui
-                                    .add_sized([width, 25.0], button)
-                                    .on_hover_text(format!(
-                                        "{} — step {} — {}",
-                                        pitch_name(pitch),
-                                        step + 1,
-                                        if active { "remove note" } else { "set note" }
-                                    ))
-                                    .clicked()
-                                {
-                                    self.controls.set_melody_note(
-                                        step,
-                                        if active { None } else { Some(pitch as u8) },
-                                    );
-                                    self.dirty = true;
+                                    if ui
+                                        .add_sized([width, 25.0], button)
+                                        .on_hover_text(format!(
+                                            "{} — step {} — {}",
+                                            pitch_name(pitch),
+                                            step + 1,
+                                            if active { "remove note" } else { "set note" }
+                                        ))
+                                        .clicked()
+                                    {
+                                        self.controls.set_melody_note(
+                                            step,
+                                            if active { None } else { Some(pitch as u8) },
+                                        );
+                                        self.dirty = true;
+                                    }
                                 }
-                            }
-                        });
-                    }
-                });
+                            });
+                        }
+                    });
 
                 ui.add_space(10.0);
                 ui.horizontal(|ui| {
