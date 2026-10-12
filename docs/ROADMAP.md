@@ -10,12 +10,23 @@ Every feature must work offline without AI. The entire interface, code documenta
 | 2.1 — Project files | Versioned JSON, Save/Open and validation | Merged into main |
 | 2.2 — Safe editing | New Project, unsaved-change guards, real GUI screenshot | Merged into main |
 | 3.1 — First melody | C4–B5 piano roll, local synth, saved notes and v1 migration | Merged into main |
-| 3.2 — Notes refinement | Note lengths, multiple patterns and keyboard editing | Planned |
+| 3.2 — Safe editing | Undo/Redo for beat, melody, BPM, and project name | In review |
+| 3.3 — Notes refinement | Note lengths, multiple patterns and keyboard editing | Planned |
 | 4 — Arrangement | Repeatable patterns on an intuitive timeline | Planned |
 | 5 — Export | Offline WAV rendering | Planned |
 | 6 — Mix | Volume, panning, meters and basic effects | Planned |
 | 7 — Extend | MIDI and open plugin formats | Planned |
 | 8 — Optional AI | Local and optional validated AI commands | Planned |
+
+## Milestone 3.2 acceptance criteria
+
+- Undo and Redo reverse actual drum hits, melody notes, tempo changes, and project-name edits.
+- The editor offers visible buttons and Ctrl/Cmd+Z, Ctrl/Cmd+Shift+Z or Ctrl/Cmd+Y.
+- Undoing an edit back to the saved state clears the unsaved-change marker.
+- Editing after an undo discards the redo branch; history stays bounded to 64 states.
+- New/Open reset history, while Save establishes the current saved-state baseline.
+- Audio callback remains lock-free and does not perform history processing.
+- Automated tests and genuine app screenshot capture pass before merging to main.
 
 ## Milestone 3.1 acceptance criteria
 
