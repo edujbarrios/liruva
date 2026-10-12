@@ -205,6 +205,7 @@ pub fn save_to_path(path: &Path, project: &Project) -> Result<(), String> {
 mod tests {
     use super::{Project, load_from_path, normalize_save_path, save_to_path};
     use crate::audio::AudioControls;
+    use crate::transport::STEPS_PER_BAR;
     use std::fs;
     use std::path::PathBuf;
     use std::time::{SystemTime, UNIX_EPOCH};
