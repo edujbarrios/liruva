@@ -1,0 +1,13 @@
+# Rust build output
+/target/
+
+# Editors and operating systems
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Local settings and secrets
+.env
+.env.*
+!.env.example

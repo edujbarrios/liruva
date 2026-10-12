@@ -1,0 +1,9 @@
+[workspace]
+members = ["crates/liruva-app"]
+resolver = "2"
+
+[workspace.package]
+edition = "2024"
+rust-version = "1.95"
+license = "GPL-3.0-or-later"
+repository = "https://github.com/edujbarrios/liruva"
