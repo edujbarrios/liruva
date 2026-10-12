@@ -2,6 +2,14 @@
 
 All notable project milestones will be documented here.
 
+## Unreleased — Milestone 3.1
+
+- Added a two-octave C4–B5 piano roll with one note per sixteenth step.
+- Added an original locally synthesized melodic instrument, mixed with percussion in the real-time audio engine.
+- Added atomic note editing, demo melody, and Clear melody.
+- Updated project format to version 2 to store melody without losing earlier drum projects.
+- Added automatic version-1 migration, pitch validation, and hardware-independent tests.
+
 ## Unreleased — Milestone 2.2
 
 - Added New Project and unsaved-change confirmation on application exit.
