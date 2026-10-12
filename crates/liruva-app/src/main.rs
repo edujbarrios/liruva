@@ -18,6 +18,14 @@ use crate::transport::{STEPS_PER_BAR, TRACK_COUNT, TRACK_NAMES};
 
 const MISSION: &str = "In the AI music era, let's make music production tools accessible, intuitive, and free for everyone.";
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum PendingAction {
+    Open,
+    New,
+    Quit,
+}
+
+
 struct LiruvaApp {
     controls: Arc<AudioControls>,
     _stream: Option<cpal::Stream>,
@@ -25,7 +33,8 @@ struct LiruvaApp {
     project_name: String,
     project_path: Option<PathBuf>,
     dirty: bool,
-    confirm_open: bool,
+    pending_action: Option<PendingAction>,
+    allow_close: bool,
     project_notice: Option<(bool, String)>,
 }
 
@@ -45,7 +54,8 @@ impl LiruvaApp {
             project_name: "Untitled Beat".to_owned(),
             project_path: None,
             dirty: false,
-            confirm_open: false,
+            pending_action: None,
+            allow_close: false,
             project_notice: None,
         }
     }
@@ -61,7 +71,7 @@ impl LiruvaApp {
         }
     }
 
-    fn save_project(&mut self, save_as: bool) {
+    fn save_project(&mut self, save_as: bool) -> bool {
         let path = if !save_as {
             self.project_path.clone().or_else(|| {
                 self.file_dialog("Save LIRUVA project")
@@ -81,7 +91,7 @@ impl LiruvaApp {
         };
 
         let Some(path) = path else {
-            return;
+            return false;
         };
 
         let path = normalize_save_path(&path);
@@ -91,8 +101,12 @@ impl LiruvaApp {
                 self.project_path = Some(path);
                 self.dirty = false;
                 self.project_notice = Some((true, "Project saved successfully.".to_owned()));
+                true
             }
-            Err(error) => self.project_notice = Some((false, error)),
+            Err(error) => {
+                self.project_notice = Some((false, error));
+                false
+            }
         }
     }
 
@@ -111,6 +125,35 @@ impl LiruvaApp {
             }
             Err(error) => {
                 self.project_notice = Some((false, error));
+            }
+        }
+    }
+
+    fn new_project(&mut self) {
+        self.controls.set_playing(false);
+        self.controls.set_bpm(120);
+        self.controls.load_starter_pattern();
+        self.project_name = "Untitled Beat".to_owned();
+        self.project_path = None;
+        self.dirty = false;
+        self.project_notice = Some((true, "New project created.".to_owned()));
+    }
+
+    fn request_action(&mut self, action: PendingAction) {
+        if self.dirty {
+            self.pending_action = Some(action);
+        } else {
+            self.perform_action(action);
+        }
+    }
+
+    fn perform_action(&mut self, action: PendingAction) {
+        self.pending_action = None;
+        match action {
+            PendingAction::Open => self.open_project(),
+            PendingAction::New => self.new_project(),
+            PendingAction::Quit => {
+                self.allow_close = true;
             }
         }
     }
@@ -135,18 +178,17 @@ impl LiruvaApp {
                         self.dirty = true;
                     }
 
+                    if ui.button("New").clicked() {
+                        self.request_action(PendingAction::New);
+                    }
                     if ui.button("Save").clicked() {
-                        self.save_project(false);
+                        let _ = self.save_project(false);
                     }
                     if ui.button("Save As…").clicked() {
-                        self.save_project(true);
+                        let _ = self.save_project(true);
                     }
                     if ui.button("Open…").clicked() {
-                        if self.dirty {
-                            self.confirm_open = true;
-                        } else {
-                            self.open_project();
-                        }
+                        self.request_action(PendingAction::Open);
                     }
 
                     ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
@@ -424,21 +466,37 @@ impl eframe::App for LiruvaApp {
                 }
             });
 
-        if self.confirm_open {
+        if ui.input(|input| input.viewport().close_requested()) && !self.allow_close {
+            if self.dirty {
+                self.pending_action = Some(PendingAction::Quit);
+                ui.ctx().send_viewport_cmd(egui::ViewportCommand::CancelClose);
+            }
+        }
+
+        if let Some(action) = self.pending_action {
             egui::Window::new("Unsaved changes")
                 .collapsible(false)
                 .resizable(false)
+                .anchor(egui::Align2::CENTER_CENTER, egui::vec2(0.0, 0.0))
                 .show(ui.ctx(), |ui| {
-                    ui.label("Opening a project will replace the current unsaved pattern.");
-                    ui.label("Save your current project first if you want to keep it.");
-                    ui.add_space(10.0);
+                    ui.label("This project contains changes that have not been saved.");
+                    ui.label("Save your beat before continuing, or discard your edits.");
+                    ui.add_space(12.0);
                     ui.horizontal(|ui| {
                         if ui.button("Cancel").clicked() {
-                            self.confirm_open = false;
+                            self.pending_action = None;
                         }
-                        if ui.button("Open without saving").clicked() {
-                            self.confirm_open = false;
-                            self.open_project();
+                        if ui.button("Discard changes").clicked() {
+                            self.perform_action(action);
+                            if action == PendingAction::Quit {
+                                ui.ctx().send_viewport_cmd(egui::ViewportCommand::Close);
+                            }
+                        }
+                        if ui.button("Save and continue").clicked() && self.save_project(false) {
+                            self.perform_action(action);
+                            if action == PendingAction::Quit {
+                                ui.ctx().send_viewport_cmd(egui::ViewportCommand::Close);
+                            }
                         }
                     });
                 });
