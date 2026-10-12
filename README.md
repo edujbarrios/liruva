@@ -36,7 +36,8 @@ This is a small drum-machine prototype, **not a full DAW yet**. The sound, nativ
 3. Adjust **Tempo** to change the groove.
 4. Give the project a name and click **Save**.
 5. Quit LIRUVA, start it again, then click **Open** to restore the saved beat.
-6. Use **Save As** to create another copy, or **New** to start fresh.\n7. If you make changes and try to leave, choose **Save and continue**, **Discard changes**, or **Cancel**.
+6. Use **Save As** to create another copy, or **New** to start fresh.
+7. If you make changes and try to leave, choose **Save and continue**, **Discard changes**, or **Cancel**.
 
 Files are stored on your own computer as readable JSON with the `.liruva` extension. Read the [project format specification](docs/PROJECT_FORMAT.md) for details. No account, internet access, API key, or AI service is required.
 
