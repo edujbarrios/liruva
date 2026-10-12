@@ -465,12 +465,13 @@ impl eframe::App for LiruvaApp {
                 }
             });
 
-        if ui.input(|input| input.viewport().close_requested()) && !self.allow_close {
-            if self.dirty {
-                self.pending_action = Some(PendingAction::Quit);
-                ui.ctx()
-                    .send_viewport_cmd(egui::ViewportCommand::CancelClose);
-            }
+        if ui.input(|input| input.viewport().close_requested())
+            && !self.allow_close
+            && self.dirty
+        {
+            self.pending_action = Some(PendingAction::Quit);
+            ui.ctx()
+                .send_viewport_cmd(egui::ViewportCommand::CancelClose);
         }
 
         if let Some(action) = self.pending_action {
