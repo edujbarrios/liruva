@@ -4,12 +4,12 @@ Every feature must work offline without AI. The entire interface, code documenta
 
 | Milestone | Deliverable | Status |
 | --- | --- | --- |
-| 0 — Foundation | Native Rust shell, GPL, docs and CI | Ready for main |
-| 1.1 — First sound | Synthesized kick, Play/Stop, BPM and dark UI | Ready for main |
-| 1.2 — Drum machine | Four voices and a looping 16-step sequencer | Ready for main |
-| 2.1 — Project files | Versioned JSON, Save/Open and validation | Ready for main |
-| 2.2 — Safe editing | New Project, unsaved-change guards, real GUI screenshot | Ready for main |
-| 3.1 — First melody | C4–B5 piano roll, local synth, saved notes and v1 migration | In review |
+| 0 — Foundation | Native Rust shell, GPL, docs and CI | Merged into main |
+| 1.1 — First sound | Synthesized kick, Play/Stop, BPM and dark UI | Merged into main |
+| 1.2 — Drum machine | Four voices and a looping 16-step sequencer | Merged into main |
+| 2.1 — Project files | Versioned JSON, Save/Open and validation | Merged into main |
+| 2.2 — Safe editing | New Project, unsaved-change guards, real GUI screenshot | Merged into main |
+| 3.1 — First melody | C4–B5 piano roll, local synth, saved notes and v1 migration | Merged into main |
 | 3.2 — Notes refinement | Note lengths, multiple patterns and keyboard editing | Planned |
 | 4 — Arrangement | Repeatable patterns on an intuitive timeline | Planned |
 | 5 — Export | Offline WAV rendering | Planned |

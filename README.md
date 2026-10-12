@@ -15,11 +15,11 @@ LIRUVA has its own original implementation, dark interface, and identity. It is 
 
 ![LIRUVA dark desktop application running on Linux, showing the 16-step drum sequencer and melodic piano roll](docs/screenshots/liruva-dark-studio.png)
 
-*Real screenshot of the Rust/egui desktop application running under a virtual Linux display. Captured automatically in GitHub Actions—not a concept render or an edited mockup. The virtual display has no physical audio output device, so the screenshot correctly shows “Audio unavailable.” Real speaker playback and native file dialogs still require desktop smoke testing.*
+*Real screenshot of the Rust/egui desktop application running under a virtual Linux display. Captured automatically in [GitHub Actions](https://github.com/edujbarrios/liruva/actions/runs/38187972064)—not a concept render or an edited mockup. The virtual display has no physical audio output device, so the screenshot correctly shows “Audio unavailable.” Real speaker playback and native file dialogs still require desktop smoke testing.*
 
-## Development status — Milestone 3.1 (development branch)
+## Development status — Early alpha (Milestone 3.1)
 
-The following features are implemented **in this development branch**:
+The following features are available in the **main branch**:
 
 - Rust desktop app with an original, dark, Material-inspired design.
 - Four-track drum machine with 16 interactive steps.
@@ -57,7 +57,7 @@ On Ubuntu/Debian:
 
 ```bash
 sudo apt-get update
-sudo apt-get install -y build-essential pkg-config libgtk-3-dev libxkbcommon-dev libwayland-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev libssl-dev libasound2-dev
+sudo apt-get install -y build-essential pkg-config libgtk-3-dev libxkbcommon-dev libxkbcommon-x11-0 libwayland-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev libssl-dev libasound2-dev
 ```
 
 On Linux, native file dialogs use XDG Desktop Portal (or a supported fallback). A desktop portal service and its backend should be installed; some environments also need Zenity. Windows and macOS need their normal native build tooling.
@@ -65,11 +65,10 @@ On Linux, native file dialogs use XDG Desktop Portal (or a supported fallback). 
 ```bash
 git clone https://github.com/edujbarrios/liruva.git
 cd liruva
-git switch feat/milestone-3-1-melody-piano-roll
 cargo run -p liruva
 ```
 
-This development branch builds on the earlier reviewed milestones. Once the checks pass, the changes will be merged to `main` in dependency order.
+Milestones 0 through 3.1 have been merged into `main`. Development continues incrementally through reviewable pull requests.
 
 Verify Rust code locally:
 
