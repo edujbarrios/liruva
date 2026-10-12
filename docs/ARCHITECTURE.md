@@ -1,6 +1,6 @@
 # Architecture
 
-Status: **Milestone 2.2**. The drum sequencer now also supports validated, versioned local project files. The full DAW architecture remains a proposal.
+Status: **Milestone 3.1**. The drum sequencer now also supports validated, versioned local project files. The full DAW architecture remains a proposal.
 
 ## Philosophy
 
@@ -14,7 +14,7 @@ Cargo workspace
     └── src/audio.rs       CPAL stream, four drum synthesizers, atomic patterns
     └── src/transport.rs   Sample-accurate 16-step clock (no audio hardware)
     └── src/project.rs     Versioned JSON serialization, validation, safe file I/O
-    └── src/theme.rs       LIRUVA design tokens
+    └── src/melody.rs      24 chromatic note names and frequencies\n    └── src/theme.rs       LIRUVA design tokens
 ```
 
 The UI has a working transport and 16-step grid connected to a CPAL output callback. Four local percussion sounds are generated in the callback, and per-track 16-bit pattern masks are read via atomics. Editing any step never locks the audio thread. No audio is produced until Play is pressed.
@@ -51,9 +51,9 @@ Possible future workspace crates: `liruva-core`, `liruva-audio`, and `liruva-pro
 
 ## Project files
 
-The project model in `src/project.rs` stores exactly four drum masks, tempo and a display name in a documented, versioned `.liruva` JSON format. Deserialization and validation complete before applying data to the audio controls. The audio thread never performs file I/O. Saving first writes and synchronizes a temporary sibling file, then renames it to the chosen path, with errors displayed in the GUI.
+The project model in `src/project.rs` stores four drum masks, sixteen optional melodic notes, tempo and a display name in a documented, versioned `.liruva` JSON format. Deserialization and validation complete before applying data to the audio controls. The audio thread never performs file I/O. Saving first writes and synchronizes a temporary sibling file, then renames it to the chosen path, with errors displayed in the GUI.
 
-Native file dialogs are intentionally modal and run from the desktop UI event loop; they are not part of the audio callback. The format's first version does not include samples or plugin data.
+Native file dialogs are intentionally modal and run from the desktop UI event loop; they are not part of the audio callback. Version 2 adds melody with an explicit migration for version-1 drum-only files. The format contains no samples or plugin data.
 
 See [PROJECT_FORMAT.md](PROJECT_FORMAT.md).
 
