@@ -25,7 +25,6 @@ enum PendingAction {
     Quit,
 }
 
-
 struct LiruvaApp {
     controls: Arc<AudioControls>,
     _stream: Option<cpal::Stream>,
@@ -469,7 +468,8 @@ impl eframe::App for LiruvaApp {
         if ui.input(|input| input.viewport().close_requested()) && !self.allow_close {
             if self.dirty {
                 self.pending_action = Some(PendingAction::Quit);
-                ui.ctx().send_viewport_cmd(egui::ViewportCommand::CancelClose);
+                ui.ctx()
+                    .send_viewport_cmd(egui::ViewportCommand::CancelClose);
             }
         }
 
