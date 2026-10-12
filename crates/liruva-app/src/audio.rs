@@ -7,6 +7,7 @@ use std::sync::atomic::{AtomicBool, AtomicU8, AtomicU16, AtomicU32, AtomicU64, O
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use cpal::{FromSample, SampleFormat, SizedSample, Stream};
 
+use crate::melody::{FREQUENCIES, MELODY_PITCH_COUNT, NO_NOTE};
 use crate::transport::{STARTER_PATTERN, STEPS_PER_BAR, StepClock, TRACK_COUNT};
 
 const STOPPED_STEP: u8 = u8::MAX;
@@ -18,6 +19,7 @@ pub struct AudioControls {
     steps_triggered: AtomicU64,
     current_step: AtomicU8,
     patterns: [AtomicU16; TRACK_COUNT],
+    melody: [AtomicU8; STEPS_PER_BAR],
 }
 
 impl Default for AudioControls {
@@ -34,6 +36,7 @@ impl Default for AudioControls {
                 AtomicU16::new(STARTER_PATTERN[2]),
                 AtomicU16::new(STARTER_PATTERN[3]),
             ],
+            melody: std::array::from_fn(|_| AtomicU8::new(NO_NOTE)),
         }
     }
 }
@@ -89,6 +92,41 @@ impl AudioControls {
         for (track, mask) in self.patterns.iter().zip(masks) {
             track.store(mask, Ordering::Release);
         }
+    }
+
+    pub fn melody_note(&self, step: usize) -> Option<u8> {
+        let pitch = self.melody[step].load(Ordering::Acquire);
+        (usize::from(pitch) < MELODY_PITCH_COUNT).then_some(pitch)
+    }
+
+    pub fn set_melody_note(&self, step: usize, note: Option<u8>) {
+        if step < STEPS_PER_BAR {
+            let encoded = note.filter(|pitch| usize::from(*pitch) < MELODY_PITCH_COUNT)
+                .unwrap_or(NO_NOTE);
+            self.melody[step].store(encoded, Ordering::Release);
+        }
+    }
+
+    pub fn melody_notes(&self) -> [Option<u8>; STEPS_PER_BAR] {
+        std::array::from_fn(|step| self.melody_note(step))
+    }
+
+    pub fn set_melody_notes(&self, notes: [Option<u8>; STEPS_PER_BAR]) {
+        for (step, pitch) in notes.into_iter().enumerate() {
+            self.set_melody_note(step, pitch);
+        }
+    }
+
+    pub fn clear_melody(&self) {
+        self.set_melody_notes([None; STEPS_PER_BAR]);
+    }
+
+    pub fn load_demo_melody(&self) {
+        let mut notes = [None; STEPS_PER_BAR];
+        for (step, pitch) in [(0, 0), (4, 4), (8, 7), (12, 12)] {
+            notes[step] = Some(pitch);
+        }
+        self.set_melody_notes(notes);
     }
 
     pub fn clear_pattern(&self) {
@@ -194,10 +232,55 @@ impl DrumVoice {
     }
 }
 
+/// Lightweight, deterministic melodic oscillator; no device calls or allocations.
+struct MelodyVoice {
+    active: bool,
+    phase: f32,
+    elapsed: f32,
+    frequency: f32,
+}
+
+impl MelodyVoice {
+    fn new() -> Self {
+        Self {
+            active: false,
+            phase: 0.0,
+            elapsed: 0.0,
+            frequency: 0.0,
+        }
+    }
+
+    fn trigger(&mut self, pitch: u8) {
+        self.active = true;
+        self.phase = 0.0;
+        self.elapsed = 0.0;
+        self.frequency = FREQUENCIES[usize::from(pitch)];
+    }
+
+    fn stop(&mut self) {
+        self.active = false;
+    }
+
+    fn next(&mut self, sample_rate: f32) -> f32 {
+        if !self.active {
+            return 0.0;
+        }
+        let attack = (self.elapsed * 140.0).min(1.0);
+        let envelope = attack * (-9.0 * self.elapsed).exp();
+        self.phase += std::f32::consts::TAU * self.frequency / sample_rate;
+        self.elapsed += 1.0 / sample_rate;
+        if self.elapsed > 0.55 {
+            self.active = false;
+        }
+        (self.phase.sin() * 0.82 + (self.phase * 2.0).sin() * 0.18) * envelope * 0.32
+    }
+}
+
 struct DrumEngine {
     clock: StepClock,
     sample_rate: f32,
     voices: [DrumVoice; TRACK_COUNT],
+    melody_voice: MelodyVoice,
     seen_generation: u64,
 }
 
@@ -212,6 +295,7 @@ impl DrumEngine {
                 DrumVoice::new(2),
                 DrumVoice::new(3),
             ],
+            melody_voice: MelodyVoice::new(),
             seen_generation: 0,
         }
     }
@@ -224,6 +308,7 @@ impl DrumEngine {
             for voice in &mut self.voices {
                 voice.stop();
             }
+            self.melody_voice.stop();
         }
 
         let playing = controls.is_playing();
@@ -232,6 +317,7 @@ impl DrumEngine {
             for voice in &mut self.voices {
                 voice.stop();
             }
+            self.melody_voice.stop();
             return 0.0;
         }
 
@@ -244,6 +330,9 @@ impl DrumEngine {
                     voice.trigger();
                 }
             }
+            if let Some(pitch) = controls.melody_note(step) {
+                self.melody_voice.trigger(pitch);
+            }
         }
 
         let sum: f32 = self
@@ -251,7 +340,7 @@ impl DrumEngine {
             .iter_mut()
             .map(|voice| voice.next(self.sample_rate))
             .sum();
-        (sum * 0.75).tanh() * 0.85
+        ((sum * 0.75 + self.melody_voice.next(self.sample_rate)) * 0.85).tanh()
     }
 
     fn fill<T: SizedSample + FromSample<f32>>(
@@ -401,6 +490,36 @@ mod tests {
         for pair in output.as_chunks::<2>().0 {
             assert_eq!(pair[0], pair[1]);
         }
+    }
+
+    #[test]
+    fn melodic_notes_can_be_edited_without_changing_drums() {
+        let controls = AudioControls::default();
+        let drums = controls.pattern_masks();
+        assert_eq!(controls.melody_note(0), None);
+        controls.set_melody_note(0, Some(12));
+        assert_eq!(controls.melody_note(0), Some(12));
+        controls.set_melody_note(0, Some(25));
+        assert_eq!(controls.melody_note(0), None);
+        controls.load_demo_melody();
+        assert_eq!(controls.melody_note(4), Some(4));
+        controls.clear_melody();
+        assert_eq!(controls.melody_notes(), [None; STEPS_PER_BAR]);
+        assert_eq!(controls.pattern_masks(), drums);
+    }
+
+    #[test]
+    fn synth_plays_with_drums_and_stops_without_audio_hardware() {
+        let controls = AudioControls::default();
+        controls.clear_pattern();
+        controls.set_melody_note(0, Some(9));
+        controls.set_playing(true);
+        let mut engine = DrumEngine::new(48_000);
+        let output: Vec<_> = (0..2_000).map(|_| engine.next(&controls)).collect();
+        assert!(output.iter().any(|sample| sample.abs() > 0.02));
+        assert!(output.iter().all(|sample| sample.is_finite() && sample.abs() <= 1.0));
+        controls.set_playing(false);
+        assert_eq!(engine.next(&controls), 0.0);
     }
 
     #[test]
