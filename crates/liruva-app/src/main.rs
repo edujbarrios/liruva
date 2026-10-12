@@ -421,6 +421,7 @@ impl LiruvaApp {
                         ui.colored_label(theme::MUTED, "Outlined column = current playhead");
                     });
                 });
+            });
     }
 
     fn show_piano_roll(&mut self, ui: &mut egui::Ui) {
