@@ -11,6 +11,12 @@ LIRUVA is an independent, community-driven, **free and open-source** digital aud
 
 LIRUVA has its own original implementation, dark interface, and identity. It is **not affiliated with Image-Line or FL Studio**.
 
+## A look at LIRUVA
+
+![LIRUVA dark desktop application running on Linux, showing the 16-step Kick, Snare, Hi-Hat and Clap sequencer](docs/screenshots/liruva-dark-studio.png)
+
+*Real screenshot of the Rust/egui desktop application running under a virtual Linux display. Captured automatically in [GitHub Actions](https://github.com/edujbarrios/liruva/actions/runs/38186742959)—not a concept render or an edited mockup. The virtual display has no physical audio output device, so the screenshot correctly shows “Audio unavailable.” Real speaker playback and native file dialogs still require desktop smoke testing.*
+
 ## Development status — Milestone 2.2 (development branch)
 
 The following features are implemented **in this development branch**:
